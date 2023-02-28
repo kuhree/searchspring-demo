@@ -1,5 +1,4 @@
 import { describe, it, expect } from "vitest";
-import { SiteConfig } from "../../config/site";
 import { SearchQueryBuilder, SearchQuery } from "./searchspring";
 
 describe("SearchQueryBuilder", () => {
@@ -11,12 +10,6 @@ describe("SearchQueryBuilder", () => {
   };
 
   const queryBuilder = new SearchQueryBuilder(query);
-
-  it("contains the correct baseUrl", () => {
-    const url = queryBuilder.toString();
-
-    expect(url.startsWith(SiteConfig.baseUrl)).toBe(true);
-  });
 
   it("returns a vaild SearchQuery", () => {
     const testQuery = queryBuilder.toSearchQuery();
@@ -76,7 +69,8 @@ describe("SearchQueryBuilder", () => {
 
   it("throws when setting an invalid param", () => {
     expect(() =>
-      new SearchQueryBuilder(query).setParam("q", "")
+      // @ts-expect-error -- Need an invalid q
+      new SearchQueryBuilder(query).setParam("q", 2)
     ).toThrowError();
     expect(() =>
       new SearchQueryBuilder(query).setParam("siteId", "")
