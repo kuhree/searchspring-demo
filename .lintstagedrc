@@ -1,4 +1,0 @@
-{
-  "*.{ts,tsx}": ["pnpm run lint --fix", "pnpm run format --write"],
-  "*.{html,css,js,json,md}": "pnpm run format --write"
-}

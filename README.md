@@ -15,7 +15,7 @@
         You’ll want to pass the search query using the “q” parameter.
 - [x] Display the product image using the “thumbnailImageUrl”, the product “name” and “price”.
   - [x] If the product has an “msrp” field and it’s greater than “price” field display the “msrp” next to the price crossed out.
-  - [ ] Above and below the results show pagination with next and previous buttons. You could also display some pages before/after the current page as applicable.
+  - [x] Above and below the results show pagination with next and previous buttons. You could also display some pages before/after the current page as applicable.
         If you’re on the first page you shouldn’t show the previous button or it should be disabled.
         If you’re on the last page you shouldn’t show the next button or it should be disabled.
 - [x] You’ll be able to change the page by making another request to our Search API with the “page” parameter set to the page you’d like to request.

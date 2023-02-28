@@ -2,7 +2,7 @@ import { RenderableProps } from "preact";
 import { SiteConfig } from "../config/site";
 
 type HeaderProps = RenderableProps<{}>;
-function Header({ children }: HeaderProps) {
+function HeaderContainer({ children }: HeaderProps) {
   return <header class="flex justify-between py-4 px-[5%]">{children}</header>;
 }
 
@@ -15,12 +15,14 @@ function ThemeToggle() {
 
     if (currentTheme) {
       classList.toggle(currentTheme);
+    } else {
+      classList.add(SiteConfig.themes[0]);
     }
   };
 
   return (
     <button onClick={handleToggleTheme}>
-      <img src={SiteConfig.logo.src} alt={SiteConfig.logo.alt} class="logo" />
+      <img src={SiteConfig.logo.src} alt={SiteConfig.logo.alt} />
     </button>
   );
 }
@@ -39,7 +41,7 @@ function NavItem({ children }: NavItemProps) {
   return <li class="mx-2">{children}</li>;
 }
 
-export default Object.assign(Header, {
+export const Header = Object.assign(HeaderContainer, {
   NavList,
   NavItem,
   ThemeToggle,

@@ -1,8 +1,9 @@
 import { useState } from "preact/hooks";
 import { JSXInternal } from "preact/src/jsx";
+import { ErrorMessage } from "./error-message";
 
 type FormProps = JSXInternal.HTMLAttributes<HTMLFormElement>;
-function Form(props: FormProps) {
+function FormContainer(props: FormProps) {
   return <form {...props} />;
 }
 
@@ -22,31 +23,6 @@ type SubmitProps = Omit<
 >;
 function Submit(props: SubmitProps) {
   return <button type="submit" {...props} />;
-}
-
-type ErrorMessageProps = {
-  summary?: string;
-  error?: Error;
-};
-function ErrorMessage({ summary, error }: ErrorMessageProps) {
-  if (error) {
-    return (
-      <details>
-        <summary>{summary ?? "An error occured while using this form"}</summary>
-        <pre>{error?.message}</pre>
-        <pre>{error?.name}</pre>
-
-        {process.env.NODE_ENV === "production" ? (
-          <>
-            <pre>{JSON.stringify(error?.cause)}</pre>
-            <pre>{error?.stack}</pre>
-          </>
-        ) : null}
-      </details>
-    );
-  }
-
-  return null;
 }
 
 type FormState<FormData> = {
@@ -132,7 +108,7 @@ export function useForm<FormData extends Object>({
   ] as const;
 }
 
-export default Object.assign(Form, {
+export const Form = Object.assign(FormContainer, {
   Input,
   Submit,
   ErrorMessage,
