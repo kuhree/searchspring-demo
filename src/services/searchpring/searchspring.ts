@@ -97,7 +97,7 @@ export class SearchQueryBuilder extends URL {
   constructor(
     readonly baseQuery: SearchQuery,
     readonly baseConfig: BaseConfig = {
-      url: SiteConfig.baseUrl,
+      url: `https://${SiteConfig.id}.a.searchspring.io`,
       path: "/api/search/search.json",
     }
   ) {

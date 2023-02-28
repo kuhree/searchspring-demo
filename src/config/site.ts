@@ -1,4 +1,4 @@
-export type SiteConfig = typeof SiteConfig;
+export type SiteConfigSchema = typeof SiteConfig;
 export const SiteConfig = {
   id: "scmq7n",
   baseUrl: "http://api.searchspring.net/api/search/search.json",

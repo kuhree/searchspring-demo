@@ -13,10 +13,10 @@ export function SearchForm({ onSubmit }: SearchFormProps) {
 
   return (
     <Form onSubmit={makeOnSubmitHandler(onSubmit)}>
-      <Form.Error error={formState.error} />
+      <Form.ErrorMessage error={formState.error} />
       <Form.Input
-        id="query"
-        name="query"
+        id="q"
+        name="q"
         label="Search by product name, price, size, etc..."
         onChange={makeOnChangeHandler()}
         value={formState.value.q}

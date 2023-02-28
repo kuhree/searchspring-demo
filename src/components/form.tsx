@@ -24,11 +24,11 @@ function Submit(props: SubmitProps) {
   return <button type="submit" {...props} />;
 }
 
-type ErrorProps = {
+type ErrorMessageProps = {
   summary?: string;
   error?: Error;
 };
-function Error({ summary, error }: ErrorProps) {
+function ErrorMessage({ summary, error }: ErrorMessageProps) {
   if (error) {
     return (
       <details>
@@ -58,7 +58,9 @@ type UseFormProps<FormData> = {
   initialData: FormData;
 };
 
-export function useForm<FormData>({ initialData }: UseFormProps<FormData>) {
+export function useForm<FormData extends Object>({
+  initialData,
+}: UseFormProps<FormData>) {
   const [formState, setFormState] = useState<FormState<FormData>>({
     value: initialData,
   });
@@ -89,7 +91,11 @@ export function useForm<FormData>({ initialData }: UseFormProps<FormData>) {
           if (!e.target) return;
           else if (!("name" in e.target) || typeof e.target.name !== "string") {
             throw new Error(
-              "Name not found on target. Please add a new to your input element."
+              "Name not found on target. Please add a name to your input element."
+            );
+          } else if (!(e.target.name in formState.value)) {
+            throw new Error(
+              "Name is not found in formState. Please add the name to your form controller."
             );
           } else if (
             !("value" in e.target) ||
@@ -129,5 +135,5 @@ export function useForm<FormData>({ initialData }: UseFormProps<FormData>) {
 export default Object.assign(Form, {
   Input,
   Submit,
-  Error,
+  ErrorMessage,
 });

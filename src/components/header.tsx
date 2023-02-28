@@ -7,11 +7,16 @@ function Header({ children }: HeaderProps) {
 }
 
 function ThemeToggle() {
-  const handleToggleTheme =
-    () =>
-    (theme: SiteConfig["themes"][number] = "dark") => {
-      document.documentElement.classList.toggle(theme);
-    };
+  const handleToggleTheme = () => {
+    const classList = document.documentElement.classList;
+    const currentTheme = SiteConfig.themes.find((theme) =>
+      classList.contains(theme)
+    );
+
+    if (currentTheme) {
+      classList.toggle(currentTheme);
+    }
+  };
 
   return (
     <button onClick={handleToggleTheme}>
