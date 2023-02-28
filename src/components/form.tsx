@@ -1,34 +1,8 @@
 import { useState } from "preact/hooks";
 import { JSXInternal } from "preact/src/jsx";
+import { z } from "zod";
+import { mergeClass } from "../utils/merge-class";
 import { ErrorMessage } from "./error-message";
-
-type FormProps = JSXInternal.HTMLAttributes<HTMLFormElement>;
-function FormContainer(props: FormProps) {
-  return <form {...props} />;
-}
-
-type InputProps = JSXInternal.HTMLAttributes<HTMLInputElement>;
-function Input({ label, ...props }: InputProps) {
-  return (
-    <label>
-      {label}
-      <input {...props} />
-    </label>
-  );
-}
-
-type SubmitProps = Omit<
-  JSXInternal.HTMLAttributes<HTMLButtonElement>,
-  "submit"
->;
-function Submit(props: SubmitProps) {
-  return <button type="submit" {...props} />;
-}
-
-type FormState<FormData> = {
-  error?: Error;
-  value: FormData;
-};
 
 type UseFormProps<FormData> = {
   initialData: FormData;
@@ -64,23 +38,24 @@ export function useForm<FormData extends Object>({
     (): JSXInternal.GenericEventHandler<HTMLInputElement> => {
       return (e) => {
         try {
-          if (!e.target) return;
-          else if (!("name" in e.target) || typeof e.target.name !== "string") {
-            throw new Error(
-              "Name not found on target. Please add a name to your input element."
-            );
-          } else if (!(e.target.name in formState.value)) {
-            throw new Error(
-              "Name is not found in formState. Please add the name to your form controller."
-            );
-          } else if (
-            !("value" in e.target) ||
-            typeof e.target.value !== "string"
-          ) {
-            throw new Error(
-              "Value not found on target. Be sure to use the correct input element."
-            );
-          }
+          const { name, value } = z
+            .object({
+              value: z.string().min(1),
+              name: z
+                .string()
+                .min(1)
+                .refine(
+                  (value) => value in formState.value,
+                  "Name is not found within form data."
+                ),
+            })
+            .parse(e.target);
+
+          setFormState((prev) => ({
+            ...prev,
+            error: undefined,
+            value: { ...prev.value, [name]: value },
+          }));
         } catch (err) {
           const error = new Error("Your input is invalid. Please try again.", {
             cause: err,
@@ -88,25 +63,53 @@ export function useForm<FormData extends Object>({
           setFormState((prev) => ({ ...prev, error }));
           return;
         }
-
-        const { name, value } = e.target;
-
-        setFormState((prev) => ({
-          ...prev,
-          error: undefined,
-          value: { ...prev.value, [name]: value },
-        }));
       };
     };
 
-  return [
-    formState,
-    {
-      makeOnChangeHandler,
-      makeOnSubmitHandler,
-    },
-  ] as const;
+  return [formState, { makeOnChangeHandler, makeOnSubmitHandler }] as const;
 }
+
+type FormProps = JSXInternal.HTMLAttributes<HTMLFormElement>;
+function FormContainer({ class: classList, ...props }: FormProps) {
+  return (
+    <form class={mergeClass("w-full max-w-md mx-auto", classList)} {...props} />
+  );
+}
+
+type InputProps = JSXInternal.HTMLAttributes<HTMLInputElement>;
+function Input({ class: classList, ...props }: InputProps) {
+  return (
+    <input
+      class={mergeClass(
+        "appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight",
+        classList
+      )}
+      {...props}
+    />
+  );
+}
+
+type SubmitProps = Omit<
+  JSXInternal.HTMLAttributes<HTMLButtonElement>,
+  "submit"
+>;
+function Submit({ class: classList, ...props }: SubmitProps) {
+  return (
+    <button
+      type="submit"
+      class={mergeClass(
+        "flex-shrink-0 bg-teal-500 hover:bg-teal-700 border-teal-500 hover:border-teal-700 text-sm border-4 text-white py-1 px-2 rounded",
+        classList
+      )}
+      {...props}
+    />
+  );
+}
+
+type FormState<FormData> = {
+  error?: Error;
+  value: FormData;
+};
 
 export const Form = Object.assign(FormContainer, {
   Input,
