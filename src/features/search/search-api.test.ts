@@ -1,5 +1,5 @@
-import { describe, it, expect } from "vitest";
-import { SearchQueryBuilder, SearchQuery } from "./searchspring";
+import { describe, expect, it } from "vitest";
+import { SearchQuery, SearchQueryBuilder } from "./search-api";
 
 describe("SearchQueryBuilder", () => {
   const query: SearchQuery = {
