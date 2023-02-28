@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { SiteConfig } from "../config/site";
+import { SiteConfig } from "../../config/site";
 
 interface SearchResultDisplay {
   brand: string;
@@ -16,7 +16,7 @@ interface SearchResultDisplay {
   price: string;
   size: Array<string>;
   title: Array<string>;
-  thumbnaiImageUrl: string;
+  thumbnailImageUrl: string;
 }
 
 interface SearchResultIdentity {
@@ -74,7 +74,7 @@ export type SearchQueryResponse = {
 export type SearchQuery = z.infer<typeof SearchQuerySchema>;
 const SearchQuerySchema = z.object({
   siteId: z.string().min(4),
-  q: z.string().min(1),
+  q: z.string(),
   resultsFormat: z.enum(["native"]),
   page: z.string().refine((value) => {
     const numValue = parseInt(value, 10);

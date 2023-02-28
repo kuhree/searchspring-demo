@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { SiteConfig } from "../config/site";
+import { SiteConfig } from "../../config/site";
 import { SearchQueryBuilder, SearchQuery } from "./searchspring";
 
 describe("SearchQueryBuilder", () => {
@@ -60,7 +60,8 @@ describe("SearchQueryBuilder", () => {
     expect(
       () => new SearchQueryBuilder(query, { url: "invalid", path: "/" })
     ).toThrowError();
-    expect(() => new SearchQueryBuilder({ ...query, q: "" })).toThrowError();
+    // @ts-expect-error -- Need an invalid q
+    expect(() => new SearchQueryBuilder({ ...query, q: 2 })).toThrowError();
     expect(
       () => new SearchQueryBuilder({ ...query, siteId: "inv" })
     ).toThrowError();
