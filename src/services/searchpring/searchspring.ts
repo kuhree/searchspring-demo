@@ -115,10 +115,11 @@ export class SearchQueryBuilder extends URL {
   }
 
   setParam(name: keyof SearchQuery, value: string) {
+    const parsedValue = z.string().parse(value);
     const originalValue = this.getParam(name);
 
     try {
-      this.searchParams.set(name, value);
+      this.searchParams.set(name, parsedValue);
       SearchQuerySchema.parse(this.toSearchQuery());
       return this;
     } catch (error) {
