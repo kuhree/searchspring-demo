@@ -40,7 +40,7 @@ export function useForm<FormData extends Object>({
         try {
           const { name, value } = z
             .object({
-              value: z.string().min(1),
+              value: z.string(),
               name: z
                 .string()
                 .min(1)
