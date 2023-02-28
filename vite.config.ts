@@ -11,7 +11,7 @@ export default defineConfig({
   plugins: [preact()],
   test: {
     environment: "happy-dom",
-    setupFiles: ["./__test__/test-setup.ts"],
+    setupFiles: ["./__tests__/_setup.ts"],
     includeSource: ["src/**/*.{ts,tsx}"],
     mockReset: true,
     restoreMocks: true,

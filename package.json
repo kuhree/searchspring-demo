@@ -13,7 +13,8 @@
     "serve:prod": "pnpm build && pnpm dlx serve dist"
   },
   "dependencies": {
-    "preact": "^10.11.3"
+    "preact": "^10.11.3",
+    "zod": "^3.20.6"
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.5.0",
