@@ -8,6 +8,8 @@ import {
   SearchQueryBuilder,
   SearchQueryResponse,
 } from ".";
+import { ErrorMessage } from "../../components/error-message";
+import { Form } from "../../components/form";
 import { SiteConfig } from "../../utils/site-config";
 
 export function SearchPage() {
@@ -45,6 +47,29 @@ export function SearchPage() {
     return fetchSearchQuery();
   };
 
+  const Placeholder = () => {
+    return (
+      <>
+        {Object.entries(Placeholders).map(([title, list]) => (
+          <section key={title} class="mx-auto px-3">
+            <h2 class="text-2xl font-bold">{title}</h2>
+
+            {list.map((collection) => (
+              <Form.Submit
+                key={collection.query}
+                onClick={() => onQuerySubmit({ q: collection.query })}
+                type="button"
+                class="m-2"
+              >
+                {collection.label}
+              </Form.Submit>
+            ))}
+          </section>
+        ))}
+      </>
+    );
+  };
+
   return (
     <>
       <SearchForm
@@ -52,7 +77,16 @@ export function SearchPage() {
         onSubmit={onQuerySubmit}
       />
 
-      {query ? (
+      {!query ? <Placeholder /> : null}
+
+      {query && query.results.length === 0 ? (
+        <ErrorMessage
+          error={new Error("Results are empty. Try another search.")}
+          summary={
+            "There doesn't appear to be any results for this query. Please try another search."
+          }
+        />
+      ) : query && query?.results.length ? (
         <Search>
           <Pagination
             pagination={query.pagination}
@@ -74,3 +108,25 @@ export function SearchPage() {
     </>
   );
 }
+
+const Placeholders = {
+  Seasons: [
+    { label: "Winter Collection", query: "winter" },
+    { label: "Fall Collection", query: "fall" },
+    { label: "Summer Collection", query: "summer" },
+    { label: "Spring Collection", query: "spring" },
+  ],
+
+  Clothing: [
+    { label: "Shop Jackets", query: "jackets" },
+    { label: "Shop Shirts", query: "shirts" },
+    { label: "Shop Pants", query: "pants" },
+    { label: "Shop Shorts", query: "shorts" },
+    { label: "Shop Shoes", query: "shoes" },
+  ],
+
+  Misc: [
+    { label: "Perfect your skincare routine", query: "skincare" },
+    { label: "Accessorize!", query: "jewelry" },
+  ],
+} as const;

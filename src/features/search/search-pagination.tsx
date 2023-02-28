@@ -31,7 +31,10 @@ export function Pagination({
   const [entriesStart, entriesEnd] = (() => {
     const start = currentPage * perPage - perPage;
 
-    const end = start + perPage;
+    let end = start + perPage;
+    if (end > totalResults) {
+      end = totalResults;
+    }
 
     return [start, end];
   })();
@@ -82,7 +85,7 @@ export function Pagination({
           </PageItem>
         ))}
 
-        <PageItem disabled class="bg-teal-100 font-bold">
+        <PageItem disabled class="font-bold text-lg">
           {currentPage}
         </PageItem>
 
