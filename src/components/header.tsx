@@ -1,5 +1,5 @@
 import { RenderableProps } from "preact";
-import { SiteConfig } from "../config/site";
+import { SiteConfig } from "../utils/site-config";
 
 type HeaderProps = RenderableProps<{}>;
 function HeaderContainer({ children }: HeaderProps) {

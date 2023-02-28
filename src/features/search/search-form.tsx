@@ -14,15 +14,18 @@ export function SearchForm({ onSubmit, initialQuery }: SearchFormProps) {
 
   return (
     <Form onSubmit={makeOnSubmitHandler(onSubmit)}>
-      <Form.Input
-        id="q"
-        name="q"
-        label="Search by product name, price, size, etc..."
-        onChange={makeOnChangeHandler()}
-        value={formState.value.q}
-      />
+      <div class="flex items-center border-b border-teal-500 py-2">
+        <Form.Input
+          id="q"
+          name="q"
+          placeholder="Search by product name, price, size, etc..."
+          aria-label="Search Query"
+          onChange={makeOnChangeHandler()}
+          value={formState.value.q}
+        />
 
-      <Form.Submit disabled={Boolean(formState.error)}>Submit</Form.Submit>
+        <Form.Submit disabled={Boolean(formState.error)}>Submit</Form.Submit>
+      </div>
       <Form.ErrorMessage error={formState.error} />
     </Form>
   );

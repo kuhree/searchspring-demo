@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { SiteConfig } from "../../config/site";
+import { SiteConfig } from "../../utils/site-config";
 
 interface SearchResultDisplay {
   brand: string;

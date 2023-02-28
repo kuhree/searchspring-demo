@@ -1,6 +1,6 @@
 import { Header } from "./components/header";
-import { SiteConfig } from "./config/site";
 import { SearchPage } from "./features/search/search-page";
+import { SiteConfig } from "./utils/site-config";
 
 function AppHeader() {
   return (

@@ -8,7 +8,7 @@ import {
   SearchQueryBuilder,
   SearchQueryResponse,
 } from ".";
-import { SiteConfig } from "../../config/site";
+import { SiteConfig } from "../../utils/site-config";
 
 export function SearchPage() {
   const [query, setQueryResults] = useState<SearchQueryResponse>();
