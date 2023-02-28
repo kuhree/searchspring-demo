@@ -5,6 +5,8 @@ import {
   SearchQueryResponse,
   SearchFormProps,
   SearchForm,
+  SearchResults,
+  PaginationProps,
 } from "./services/searchpring";
 import { useRef, useState } from "preact/hooks";
 
@@ -27,9 +29,7 @@ function AppHeader() {
 }
 
 export function App() {
-  const [query, setQueryResults] = useState<{
-    current: undefined | SearchQueryResponse;
-  }>({ current: undefined });
+  const [query, setQueryResults] = useState<SearchQueryResponse>();
 
   const builderRef = useRef(
     new SearchQueryBuilder({
@@ -40,11 +40,11 @@ export function App() {
     })
   );
 
-  const fetchToReRender = async () => {
+  const fetchSearchQuery = async () => {
     const { current: queryBuilder } = builderRef;
     return fetch(queryBuilder.toString())
       .then((res) => res.json())
-      .then((data) => setQueryResults((prev) => ({ ...prev, current: data })))
+      .then((data) => setQueryResults(data))
       .catch((e) => console.error(e));
   };
 
@@ -52,14 +52,15 @@ export function App() {
     const { current: queryBuilder } = builderRef;
     queryBuilder.setParam("page", String(page));
 
-    return fetchToReRender();
+    return fetchSearchQuery();
   };
 
   const onQuerySubmit: SearchFormProps["onSubmit"] = async (value) => {
     const { current: queryBuilder } = builderRef;
+    queryBuilder.setParam("page", "1");
     queryBuilder.setParam("q", value.q);
 
-    return fetchToReRender();
+    return fetchSearchQuery();
   };
 
   return (
@@ -72,103 +73,25 @@ export function App() {
       </section>
 
       <SearchForm onSubmit={onQuerySubmit} />
-      <SearchResults
-        response={query?.current}
-        actions={{
-          onPageSelect,
-        }}
-      />
-    </>
-  );
-}
+      {query ? (
+        <SearchResults>
+          <SearchResults.Pagination
+            pagination={query.pagination}
+            onPageSelect={onPageSelect}
+          />
 
-type SearchResultsProps = {
-  response: undefined | SearchQueryResponse;
-  actions: {
-    onPageSelect: PaginationProps["onPageSelect"];
-  };
-};
+          <SearchResults.ResultsGrid>
+            {query.results.map((item) => (
+              <SearchResults.ResultItem key={item.id} item={item} />
+            ))}
+          </SearchResults.ResultsGrid>
 
-function SearchResults({ response, actions }: SearchResultsProps) {
-  const { results, sorting, pagination } = response ?? {};
-
-  return (
-    <section>
-      {pagination ? (
-        <Pagination
-          pagination={pagination}
-          onPageSelect={actions.onPageSelect}
-        />
+          <SearchResults.Pagination
+            pagination={query.pagination}
+            onPageSelect={onPageSelect}
+          />
+        </SearchResults>
       ) : null}
-      {results ? <ResultGrid results={results} /> : null}
-    </section>
-  );
-}
-
-type PaginationProps = {
-  pagination: SearchQueryResponse["pagination"];
-  // eslint-disable-next-line -- It's a type!
-  onPageSelect: (page: number) => void;
-};
-function Pagination({ pagination, onPageSelect }: PaginationProps) {
-  const { totalResults = 0, currentPage = 0, totalPages = 0 } = pagination;
-
-  const [previousPages, currentPages, nextPages] = (() => {
-    const list = Array.from({ length: totalPages }, (_, i) => i + 1);
-
-    const [before, current, after] = [
-      list.slice(0, currentPage - 1),
-      [currentPage],
-      list.slice(currentPage),
-    ];
-
-    return [before.slice(-3), current, after.slice(0, 3)];
-  })();
-
-  const Page = ({ page }: { page: number }) => {
-    return (
-      <button class="mx-2" onClick={() => onPageSelect(page)}>
-        {page}
-      </button>
-    );
-  };
-
-  return (
-    <div>
-      <div class="flex items-center content-center">
-        {previousPages.map((page) => (
-          <Page key={page} page={page} />
-        ))}
-
-        {currentPages.map((page) => (
-          <Page key={page} page={page} />
-        ))}
-
-        {nextPages.map((page) => (
-          <Page key={page} page={page} />
-        ))}
-      </div>
-      <span> Total Results: {totalResults}</span>
-    </div>
-  );
-}
-
-type ResultGridProps = {
-  results: SearchQueryResponse["results"];
-};
-function ResultGrid({ results }: ResultGridProps) {
-  return (
-    <div>
-      {results.map((result) => (
-        <article key={result.id}>
-          <h2>{result.name}</h2>
-          <img src={result.thumbnailImageUrl} alt={result.name} />
-          <span>${result.price}</span>
-          <span class={`${result.price < result.msrp ? "line-through" : ""}`}>
-            ${result.msrp}
-          </span>
-        </article>
-      ))}
-    </div>
+    </>
   );
 }
