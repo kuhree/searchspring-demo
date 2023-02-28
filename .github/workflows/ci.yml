@@ -25,6 +25,11 @@ jobs:
         run: |
           npm install -g pnpm
           pnpm install
+      - name: Testing
+        run: |
+          pnpm format --check
+          pnpm lint
+          pnpm test
       - name: Build with Vite
         run: pnpm build
       - id: pages
