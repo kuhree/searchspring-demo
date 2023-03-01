@@ -20,6 +20,25 @@
         If you’re on the last page you shouldn’t show the next button or it should be disabled.
 - [x] You’ll be able to change the page by making another request to our Search API with the “page” parameter set to the page you’d like to request.
 
+## Addons
+
+- [ ] Add router
+  - [ ] Sync search to url for shareable searches
+- [ ] Advanced Search
+  - [ ] In-Query Refinement
+  - [ ] Implement Filters
+  - [ ] Implement Sort
+- [ ] Search history
+- [ ] More themes
+
+## Bugs
+
+- [ ] Query is not always synced to the form
+- [ ] Improve ResultsGrid and ResultItem display
+- [ ] Theming
+  - [ ] Change logo and favicon
+  - [ ] Implement dark theme
+
 ### Resources
 
 Yours does not need to be as involved, but we would like to see what you come up with for a design.
