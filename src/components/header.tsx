@@ -1,9 +1,41 @@
-import { RenderableProps } from "preact";
+import { HTMLProps, PropsWithChildren } from "react";
+import { useNavigation } from "react-router-dom";
+import { mergeClass } from "../utils/merge-class";
 import { SiteConfig } from "../utils/site-config";
 
-type HeaderProps = RenderableProps<{}>;
-function HeaderContainer({ children }: HeaderProps) {
-  return <header class="flex justify-between py-4 px-[5%]">{children}</header>;
+type HeaderProps = PropsWithChildren &
+  Pick<HTMLProps<HTMLHeadingElement>, "className">;
+function HeaderContainer({ children, className }: HeaderProps) {
+  const navigation = useNavigation();
+
+  const stateClass = (() => {
+    switch (navigation.state) {
+      case "submitting": {
+        return "submitting";
+      }
+
+      case "loading": {
+        return "loading";
+      }
+
+      case "idle":
+      default: {
+        return "idle";
+      }
+    }
+  })();
+
+  return (
+    <header
+      className={mergeClass(
+        "flex justify-between py-4 px-[5%]",
+        className,
+        stateClass
+      )}
+    >
+      {children}
+    </header>
+  );
 }
 
 function ThemeToggle() {
@@ -27,18 +59,18 @@ function ThemeToggle() {
   );
 }
 
-type NavProps = RenderableProps<{}>;
+type NavProps = PropsWithChildren;
 function NavList({ children }: NavProps) {
   return (
     <nav>
-      <ul class="flex">{children}</ul>
+      <ul className="flex">{children}</ul>
     </nav>
   );
 }
 
-type NavItemProps = RenderableProps<{}>;
+type NavItemProps = PropsWithChildren;
 function NavItem({ children }: NavItemProps) {
-  return <li class="mx-2">{children}</li>;
+  return <li className="mx-2">{children}</li>;
 }
 
 export const Header = Object.assign(HeaderContainer, {

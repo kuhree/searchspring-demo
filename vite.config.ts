@@ -1,7 +1,7 @@
 /// <reference types="vitest" />
 
 import { defineConfig } from "vite";
-import preact from "@preact/preset-vite";
+import react from "@vitejs/plugin-react";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -9,7 +9,7 @@ export default defineConfig({
   define: {
     "import.meta.vitest": "undefined",
   },
-  plugins: [preact()],
+  plugins: [react()],
   test: {
     environment: "happy-dom",
     setupFiles: ["./__tests__/_setup.ts"],

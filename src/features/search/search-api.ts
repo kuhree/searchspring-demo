@@ -1,3 +1,5 @@
+/* eslint-disable no-use-before-define -- schemas === interfaces */
+
 import { z } from "zod";
 import { SiteConfig } from "../../utils/site-config";
 
@@ -71,73 +73,152 @@ export type SearchQueryResponse = {
   results: Array<SearchResult>;
 };
 
+// type NonEmptyString = z.infer<typeof NonEmptyStringSchema>;
+// const NonEmptyStringSchema = z.string().min(1);
+
+// type ListTupleItem = z.infer<ListTupleItem>;
+// const ListTupleItemSchema = z.tuple([
+//   NonEmptyStringSchema,
+//   NonEmptyStringSchema,
+// ]);
+
+// type ListParam = z.infer<typeof ListParamSchema>;
+// const ListParamSchema = z.array(ListTupleItemSchema);
+
 export type SearchQuery = z.infer<typeof SearchQuerySchema>;
 const SearchQuerySchema = z.object({
-  siteId: z.string().min(4),
   q: z.string(),
-  resultsFormat: z.enum(["native"]),
-  page: z.string().refine((value) => {
-    const numValue = parseInt(value, 10);
-
-    if (isNaN(numValue) || typeof numValue !== "number") {
-      return false;
-    }
-
-    return true;
-  }, "Page must be a number"),
+  page: z.number().min(1).default(1),
+  resultsFormat: z.enum(["native"]).default("native"),
+  siteId: z.string().min(4).default(SiteConfig.id),
+  // filter: ListParamSchema.default([]),
+  // sort: ListParamSchema.default([]),
 });
 
-export type BaseConfig = z.infer<typeof BaseconfigSchema>;
-const BaseconfigSchema = z.object({
+// export type AdvancedSearchQueryParams = z.infer<
+//   typeof AdvancedSearchQuerySchema
+// >;
+// const AdvancedSearchQuerySchema = SearchQuerySchema.pick({
+//   filter: true,
+//   sort: true,
+// });
+
+export type NetworkConfig = z.infer<typeof NetworkConfigSchema>;
+const NetworkConfigSchema = z.object({
   url: z.string().url(),
-  path: z.string().min(1),
+  path: z.string().min(1).optional(),
 });
 
-export class SearchQueryBuilder extends URL {
-  constructor(
-    readonly baseQuery: SearchQuery,
-    readonly baseConfig: BaseConfig = {
-      url: `https://${SiteConfig.id}.a.searchspring.io`,
-      path: "/api/search/search.json",
-    }
-  ) {
-    super(baseConfig.path, baseConfig.url);
+export class SearchQueryBuilder {
+  readonly url;
 
-    SearchQuerySchema.parse(baseQuery);
-    Object.entries(baseQuery).forEach(([name, value]) => {
-      this.searchParams.set(name, value);
-    });
-    SearchQuerySchema.parse(this.toSearchQuery());
+  constructor(rawQuery?: undefined | SearchQuery, network?: NetworkConfig) {
+    const {
+      path = "/api/search/search.json",
+      url = `http://api.searchspring.net`,
+    } = network ?? {};
+
+    this.url = new URL(path, url);
+    rawQuery && this.parseQuery(rawQuery);
+  }
+
+  parseQuery(rawQuery: SearchQuery) {
+    const baseQuery = SearchQuerySchema.parse(rawQuery);
+    for (const [name, value] of Object.entries(baseQuery)) {
+      this.setParam(name as keyof typeof baseQuery, String(value));
+    }
+
+    return this;
   }
 
   getParam(name: keyof SearchQuery) {
-    return this.searchParams.get(name);
-  }
+    switch (name) {
+      // case "sort":
+      // case "filter": {
+      //   const keyList = Array.from(this.url.searchParams.keys()).filter((key) =>
+      //     key.startsWith(`${name}.`)
+      //   );
+      //   return keyList.flatMap((key) => this.url.searchParams.getAll(key));
+      // }
 
-  setParam(name: keyof SearchQuery, value: string) {
-    const parsedValue = z.string().parse(value);
-    const originalValue = this.getParam(name);
-
-    try {
-      this.searchParams.set(name, parsedValue);
-      SearchQuerySchema.parse(this.toSearchQuery());
-      return this;
-    } catch (error) {
-      if (originalValue) {
-        // revert changes
-        this.searchParams.set(name, originalValue);
+      default: {
+        return this.url.searchParams.getAll(name);
       }
-
-      throw error;
     }
   }
 
-  toSearchQuery(): SearchQuery {
-    const newEntries = Object.keys(this.baseQuery).map((name) => [
-      name,
-      this.getParam(name as keyof SearchQuery),
-    ]);
+  setParam(
+    name: keyof SearchQuery,
+    // rawValue: string | [keyof AdvancedSearchQueryParams, string]
+    rawValue: SearchQuery[typeof name]
+  ) {
+    const parsedValue = z
+      .string()
+      .or(z.number())
+      // .or(ListTupleItemSchema)
+      .parse(rawValue);
 
-    return Object.fromEntries(newEntries);
+    // if (isArray(parsedValue)) {
+    //   const [listKey, listValue] = parsedValue;
+    //
+    //   const id = `${name}.${listKey}`;
+    //
+    //   this.url.searchParams.set(id, listValue);
+    // } else {
+    this.url.searchParams.set(name, String(parsedValue));
+    // }
+
+    return this;
+  }
+
+  deleteParam(name: keyof SearchQuery) {
+    const mutation = () => {
+      switch (name) {
+        // case "sort":
+        // case "filter": {
+        //   const listKey = name.split(".")[0];
+        //   const id = `${name}.${listKey}`;
+        //   if (this.url.searchParams.has(id)) {
+        //     this.url.searchParams.delete(id);
+        //   }
+        // }
+
+        default: {
+          this.url.searchParams.delete(name);
+        }
+      }
+    };
+
+    mutation();
+    return this;
+  }
+
+  build(): SearchQuery {
+    // Create a params object
+    const params: Record<string, unknown> = {};
+    this.url.searchParams.forEach((val, key) => {
+      // if (key.startsWith("sort") || key.startsWith("filter")) {
+      //   const [name, listKey] = key.split(".")[0];
+      //
+      //   const listRef = params[name];
+      //   if (name in query && isArray(listRef)) {
+      //     listRef.push([listKey, val]);
+      //   } else {
+      //     params[name] = [[listKey, val]];
+      //   }
+      // } else
+
+      if (key === "page") {
+        params[key] = Number(val);
+      } else {
+        params[key] = val;
+      }
+    });
+
+    return SearchQuerySchema.parse(params);
   }
 }
+
+// function isArray(value: unknown): value is Array<unknown> {
+//   return Array.isArray(value);
+// }
