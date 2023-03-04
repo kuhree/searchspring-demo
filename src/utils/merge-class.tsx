@@ -1,11 +1,3 @@
-import { JSXInternal } from "preact/src/jsx";
-
-export function mergeClass(
-  ...classList: (
-    | string
-    | JSXInternal.SignalLike<string | undefined>
-    | undefined
-  )[]
-) {
+export function mergeClass(...classList: (string | undefined)[]) {
   return classList.filter(Boolean).join(" ");
 }

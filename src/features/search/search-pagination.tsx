@@ -1,5 +1,4 @@
-import { RenderableProps } from "preact";
-import { JSXInternal } from "preact/src/jsx";
+import { HTMLAttributes, PropsWithChildren } from "react";
 import { mergeClass } from "../../utils/merge-class";
 import { SearchQueryResponse } from "./search-api";
 
@@ -46,33 +45,36 @@ export function Pagination({
   return (
     <nav
       aria-label="Page Navigation"
-      class="w-full flex flex-col items-center my-3"
+      className="w-full flex flex-col items-center my-3"
     >
-      <ul class="inline-flex items-center -space-x-px">
+      <ul className="inline-flex items-center -space-x-px">
         <PageItem
           onClick={makeOnPageClickHandler(currentPage - 1)}
           disabled={currentPage === 1}
-          class="rounded-l-md"
+          className="rounded-l-md"
         >
-          <span class="sr-only">Previous</span>
+          <span className="sr-only">Previous</span>
           <svg
             aria-hidden="true"
-            class="w-5 h-5"
+            className="w-5 h-5"
             fill="currentColor"
             viewBox="0 0 20 20"
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              fill-rule="evenodd"
+              fillRule="evenodd"
               d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-              clip-rule="evenodd"
+              clipRule="evenodd"
             />
           </svg>
         </PageItem>
 
         {firstPage ? (
           <>
-            <PageItem onClick={makeOnPageClickHandler(firstPage)}>
+            <PageItem
+              onClick={makeOnPageClickHandler(firstPage)}
+              disabled={false}
+            >
               {firstPage}
             </PageItem>
             <PageItem disabled>...</PageItem>
@@ -80,17 +82,25 @@ export function Pagination({
         ) : null}
 
         {previousPages.map((page) => (
-          <PageItem key={page} onClick={makeOnPageClickHandler(page)}>
+          <PageItem
+            key={page}
+            onClick={makeOnPageClickHandler(page)}
+            disabled={false}
+          >
             {page}
           </PageItem>
         ))}
 
-        <PageItem disabled class="font-bold text-lg">
+        <PageItem disabled className="font-bold text-lg">
           {currentPage}
         </PageItem>
 
         {nextPages.map((page) => (
-          <PageItem key={page} onClick={makeOnPageClickHandler(page)}>
+          <PageItem
+            key={page}
+            onClick={makeOnPageClickHandler(page)}
+            disabled={false}
+          >
             {page}
           </PageItem>
         ))}
@@ -98,7 +108,10 @@ export function Pagination({
         {lastPage ? (
           <>
             <PageItem disabled>...</PageItem>
-            <PageItem onClick={makeOnPageClickHandler(lastPage)}>
+            <PageItem
+              onClick={makeOnPageClickHandler(lastPage)}
+              disabled={false}
+            >
               {lastPage}
             </PageItem>
           </>
@@ -107,26 +120,26 @@ export function Pagination({
         <PageItem
           onClick={makeOnPageClickHandler(currentPage + 1)}
           disabled={currentPage === totalPages}
-          class="rounded-r-md"
+          className="rounded-r-md"
         >
-          <span class="sr-only">Next</span>
+          <span className="sr-only">Next</span>
           <svg
             aria-hidden="true"
-            class="w-5 h-5"
+            className="w-5 h-5"
             fill="currentColor"
             viewBox="0 0 20 20"
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              fill-rule="evenodd"
+              fillRule="evenodd"
               d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-              clip-rule="evenodd"
+              clipRule="evenodd"
             />
           </svg>
         </PageItem>
       </ul>
 
-      <span class="text-sm text-gray-700 dark:text-gray-400">
+      <span className="text-sm text-gray-700 dark:text-gray-400">
         Showing <HelpText>{entriesStart}</HelpText> to{" "}
         <HelpText>{entriesEnd}</HelpText> of <HelpText>{totalResults}</HelpText>{" "}
         Entries
@@ -135,32 +148,17 @@ export function Pagination({
   );
 }
 
-type PageProps =
-  | RenderableProps<
-      Pick<
-        JSXInternal.HTMLAttributes<HTMLButtonElement>,
-        "onClick" | "disabled" | "class"
-      >
-    >
-  | {
-      children: string;
-      disabled: true;
-      onClick?: never;
-      class: string;
-    };
+type PageProps = PropsWithChildren<
+  Pick<HTMLAttributes<HTMLButtonElement>, "onClick" | "disabled" | "className">
+>;
 
-function PageItem({
-  children,
-  onClick,
-  disabled,
-  class: classList,
-}: PageProps) {
+function PageItem({ children, onClick, disabled, className }: PageProps) {
   return (
     <li>
       <button
-        class={mergeClass(
+        className={mergeClass(
           "px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white",
-          classList
+          className
         )}
         onClick={onClick}
         disabled={disabled}
@@ -171,11 +169,13 @@ function PageItem({
   );
 }
 
-type HelpTextProps = RenderableProps<{}>;
+type HelpTextProps = PropsWithChildren;
 
 function HelpText({ children }: HelpTextProps) {
   return (
-    <span class="font-semibold text-gray-900 dark:text-white">{children}</span>
+    <span className="font-semibold text-gray-900 dark:text-white">
+      {children}
+    </span>
   );
 }
 
