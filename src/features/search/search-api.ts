@@ -87,7 +87,7 @@ export type SearchQueryResponse = {
 
 export type SearchQuery = z.infer<typeof SearchQuerySchema>;
 const SearchQuerySchema = z.object({
-  q: z.string(),
+  q: z.string().default(""),
   page: z.number().min(1).default(1),
   resultsFormat: z.enum(["native"]).default("native"),
   siteId: z.string().min(4).default(SiteConfig.id),
@@ -110,39 +110,31 @@ const NetworkConfigSchema = z.object({
 });
 
 export class SearchQueryBuilder {
-  readonly url;
+  private readonly url: URL;
 
-  constructor(rawQuery?: undefined | SearchQuery, network?: NetworkConfig) {
+  constructor(
+    rawQuery?: undefined | string | SearchQuery,
+    network?: NetworkConfig
+  ) {
     const {
       path = "/api/search/search.json",
       url = `http://api.searchspring.net`,
     } = network ?? {};
 
     this.url = new URL(path, url);
-    rawQuery && this.parseQuery(rawQuery);
-  }
 
-  parseQuery(rawQuery: SearchQuery) {
-    const baseQuery = SearchQuerySchema.parse(rawQuery);
-    for (const [name, value] of Object.entries(baseQuery)) {
-      this.setParam(name as keyof typeof baseQuery, String(value));
-    }
+    if (typeof rawQuery === "string") {
+      const params = new URLSearchParams(rawQuery.split("?").at(-1));
 
-    return this;
-  }
+      params.forEach((value, name) => {
+        this.setParam(name as keyof SearchQuery, value);
+      });
 
-  getParam(name: keyof SearchQuery) {
-    switch (name) {
-      // case "sort":
-      // case "filter": {
-      //   const keyList = Array.from(this.url.searchParams.keys()).filter((key) =>
-      //     key.startsWith(`${name}.`)
-      //   );
-      //   return keyList.flatMap((key) => this.url.searchParams.getAll(key));
-      // }
-
-      default: {
-        return this.url.searchParams.getAll(name);
+      return new SearchQueryBuilder(this.build());
+    } else if (rawQuery) {
+      const baseQuery = SearchQuerySchema.parse(rawQuery);
+      for (const [name, value] of Object.entries(baseQuery)) {
+        this.setParam(name as keyof typeof baseQuery, String(value));
       }
     }
   }
@@ -171,6 +163,22 @@ export class SearchQueryBuilder {
     return this;
   }
 
+  getParam(name: keyof SearchQuery) {
+    switch (name) {
+      // case "sort":
+      // case "filter": {
+      //   const keyList = Array.from(this.url.searchParams.keys()).filter((key) =>
+      //     key.startsWith(`${name}.`)
+      //   );
+      //   return keyList.flatMap((key) => this.url.searchParams.getAll(key));
+      // }
+
+      default: {
+        return this.url.searchParams.getAll(name);
+      }
+    }
+  }
+
   deleteParam(name: keyof SearchQuery) {
     const mutation = () => {
       switch (name) {
@@ -196,7 +204,7 @@ export class SearchQueryBuilder {
   build(): SearchQuery {
     // Create a params object
     const params: Record<string, unknown> = {};
-    this.url.searchParams.forEach((val, key) => {
+    this.url.searchParams.forEach((value, key) => {
       // if (key.startsWith("sort") || key.startsWith("filter")) {
       //   const [name, listKey] = key.split(".")[0];
       //
@@ -209,13 +217,23 @@ export class SearchQueryBuilder {
       // } else
 
       if (key === "page") {
-        params[key] = Number(val);
+        params[key] = Number(value);
       } else {
-        params[key] = val;
+        params[key] = value;
       }
     });
 
     return SearchQuerySchema.parse(params);
+  }
+
+  toStringQuery() {
+    this.build();
+    return this.url.toString();
+  }
+
+  toSearchParams() {
+    this.build();
+    return this.url.searchParams.toString();
   }
 }
 

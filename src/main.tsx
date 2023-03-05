@@ -3,7 +3,7 @@ import { RouterProvider } from "react-router-dom";
 import React from "react";
 
 import { router } from "./router";
-import "./index.css";
+import "./index.scss";
 
 const rootNode = document.getElementById("app");
 const root = ReactDOM.createRoot(rootNode as HTMLElement);

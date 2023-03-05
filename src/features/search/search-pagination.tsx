@@ -1,8 +1,9 @@
-import { HTMLAttributes, PropsWithChildren } from "react";
+import { HTMLProps, PropsWithChildren } from "react";
 import { mergeClass } from "../../utils/merge-class";
 import { SearchQueryResponse } from "./search-api";
 
 export type PaginationProps = {
+  container?: Pick<HTMLProps<HTMLDivElement>, "className">;
   pagination: SearchQueryResponse["pagination"];
   range?: number;
   // eslint-disable-next-line -- It's a type!
@@ -10,6 +11,7 @@ export type PaginationProps = {
 };
 
 export function Pagination({
+  container,
   pagination,
   onPageSelect,
   range = 2,
@@ -30,9 +32,11 @@ export function Pagination({
   const [entriesStart, entriesEnd] = (() => {
     const start = currentPage * perPage - perPage;
 
-    let end = start + perPage;
+    let end = start + perPage - 1;
     if (end > totalResults) {
       end = totalResults;
+    } else if (end < 0) {
+      end = 0;
     }
 
     return [start, end];
@@ -45,13 +49,15 @@ export function Pagination({
   return (
     <nav
       aria-label="Page Navigation"
-      className="w-full flex flex-col items-center my-3"
+      className={mergeClass(
+        "w-full flex flex-col items-center my-3",
+        container?.className
+      )}
     >
       <ul className="inline-flex items-center -space-x-px">
         <PageItem
           onClick={makeOnPageClickHandler(currentPage - 1)}
           disabled={currentPage === 1}
-          className="rounded-l-md"
         >
           <span className="sr-only">Previous</span>
           <svg
@@ -91,7 +97,7 @@ export function Pagination({
           </PageItem>
         ))}
 
-        <PageItem disabled className="font-bold text-lg">
+        <PageItem disabled className="text-accent font-bold">
           {currentPage}
         </PageItem>
 
@@ -109,6 +115,7 @@ export function Pagination({
           <>
             <PageItem disabled>...</PageItem>
             <PageItem
+              className="text-muted"
               onClick={makeOnPageClickHandler(lastPage)}
               disabled={false}
             >
@@ -120,7 +127,6 @@ export function Pagination({
         <PageItem
           onClick={makeOnPageClickHandler(currentPage + 1)}
           disabled={currentPage === totalPages}
-          className="rounded-r-md"
         >
           <span className="sr-only">Next</span>
           <svg
@@ -139,17 +145,17 @@ export function Pagination({
         </PageItem>
       </ul>
 
-      <span className="text-sm text-gray-700 dark:text-gray-400">
+      <span className="text-xs">
         Showing <HelpText>{entriesStart}</HelpText> to{" "}
-        <HelpText>{entriesEnd}</HelpText> of <HelpText>{totalResults}</HelpText>{" "}
-        Entries
+        <HelpText>{entriesEnd >= 0 ? entriesEnd : 0}</HelpText> of{" "}
+        <HelpText>{totalResults}</HelpText> Entries
       </span>
     </nav>
   );
 }
 
 type PageProps = PropsWithChildren<
-  Pick<HTMLAttributes<HTMLButtonElement>, "onClick" | "disabled" | "className">
+  Pick<HTMLProps<HTMLButtonElement>, "onClick" | "disabled" | "className">
 >;
 
 function PageItem({ children, onClick, disabled, className }: PageProps) {
@@ -157,7 +163,8 @@ function PageItem({ children, onClick, disabled, className }: PageProps) {
     <li>
       <button
         className={mergeClass(
-          "px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white",
+          "px-1 py-1 leading-tight font-cursive text-2xl",
+          disabled ? "text-muted" : "text-accent hover:text-accent",
           className
         )}
         onClick={onClick}
@@ -173,7 +180,7 @@ type HelpTextProps = PropsWithChildren;
 
 function HelpText({ children }: HelpTextProps) {
   return (
-    <span className="font-semibold text-gray-900 dark:text-white">
+    <span className="font-semibold text-accent text-xl font-cursive">
       {children}
     </span>
   );

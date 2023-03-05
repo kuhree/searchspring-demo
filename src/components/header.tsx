@@ -1,5 +1,9 @@
 import { HTMLProps, PropsWithChildren } from "react";
-import { useNavigation } from "react-router-dom";
+import {
+  NavLink as RRNavLink,
+  NavLinkProps as RRNavLinkProps,
+  useNavigation,
+} from "react-router-dom";
 import { mergeClass } from "../utils/merge-class";
 import { SiteConfig } from "../utils/site-config";
 
@@ -9,26 +13,28 @@ function HeaderContainer({ children, className }: HeaderProps) {
   const navigation = useNavigation();
 
   const stateClass = (() => {
+    const classList = new Set(["transition-colors", "border-b-4"]);
     switch (navigation.state) {
-      case "submitting": {
-        return "submitting";
-      }
-
+      case "submitting":
       case "loading": {
-        return "loading";
+        classList.add("border-accent");
+        break;
       }
 
       case "idle":
       default: {
-        return "idle";
+        classList.add("border-muted");
+        break;
       }
     }
+
+    return [...classList].join(" ");
   })();
 
   return (
     <header
       className={mergeClass(
-        "flex justify-between py-4 px-[5%]",
+        "flex items-center justify-between py-2 px-[5%] shadow-xl z-50",
         className,
         stateClass
       )}
@@ -41,15 +47,11 @@ function HeaderContainer({ children, className }: HeaderProps) {
 function ThemeToggle() {
   const handleToggleTheme = () => {
     const classList = document.documentElement.classList;
-    const currentTheme = SiteConfig.themes.find((theme) =>
-      classList.contains(theme)
-    );
+    const theme = "dark";
+    const isActive = classList.toggle(theme);
 
-    if (currentTheme) {
-      classList.toggle(currentTheme);
-    } else {
-      classList.add(SiteConfig.themes[0]);
-    }
+    if (isActive) localStorage.setItem("theme", theme);
+    else localStorage.removeItem("theme");
   };
 
   return (
@@ -69,12 +71,42 @@ function NavList({ children }: NavProps) {
 }
 
 type NavItemProps = PropsWithChildren;
-function NavItem({ children }: NavItemProps) {
-  return <li className="mx-2">{children}</li>;
+function NavListItem({ children }: NavItemProps) {
+  return <li className="mx-1">{children}</li>;
+}
+
+type NavLinkProps = PropsWithChildren<
+  RRNavLinkProps | HTMLProps<HTMLAnchorElement>
+>;
+
+function NavLink({ children, className, ...props }: NavLinkProps) {
+  const makeNavListClassName: RRNavLinkProps["className"] = (args) => {
+    const { isActive, isPending } = args;
+
+    return mergeClass(
+      `${isActive ? "text-accent" : ""} ${isPending ? "text-muted" : ""}`,
+      typeof className === "function" ? className(args) : className
+    );
+  };
+
+  if ("href" in props && props.href) {
+    return <a {...props}>{children}</a>;
+  } else if ("to" in props && props.to) {
+    return (
+      <RRNavLink className={makeNavListClassName} {...props}>
+        {children}
+      </RRNavLink>
+    );
+  }
+
+  throw new Error("Invalid NavLink", {
+    cause: new Error("Property `to` OR `href` is required"),
+  });
 }
 
 export const Header = Object.assign(HeaderContainer, {
   NavList,
-  NavItem,
+  NavListItem,
+  NavLink,
   ThemeToggle,
 });

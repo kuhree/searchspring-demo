@@ -6,17 +6,54 @@ describe("SearchQueryBuilder", () => {
   const query: SearchQuery = {
     siteId: "abcde",
     q: "testing",
-    page: 1,
+    page: 2,
     resultsFormat: "native",
     // filter: [],
     // sort: [],
   };
 
-  it("returns a vaild SearchQuery", () => {
+  it("returns a default query", () => {
+    const queryBuiler = new SearchQueryBuilder();
+    const json = queryBuiler.build();
+
+    Object.keys(query).forEach((key) => {
+      expect(json).toHaveProperty(key);
+
+      switch (key as keyof typeof query) {
+        case "resultsFormat": {
+          expect(json[key as keyof typeof query]).toBe("native");
+          break;
+        }
+        case "siteId": {
+          expect(json[key as keyof typeof query]).toBe(SiteConfig.id);
+          break;
+        }
+        case "page": {
+          expect(json[key as keyof typeof query]).toBe(1);
+          break;
+        }
+        case "q":
+        default: {
+          expect(json[key as keyof typeof query]).toBe("");
+          break;
+        }
+      }
+    });
+  });
+
+  it("returns a valid SearchQuery from a JSON SearchQuery", () => {
     const queryBuilder = new SearchQueryBuilder(query);
     const testQuery = queryBuilder.build();
 
     expect(testQuery).toMatchObject(query);
+  });
+
+  it("returns a valid SearchQuery from a string SearchQuery", () => {
+    const queryBuilder = new SearchQueryBuilder(query);
+    const strQuery = queryBuilder.toStringQuery();
+    const fromString = new SearchQueryBuilder(strQuery).build();
+
+    expect(fromString).toMatchObject(query);
   });
 
   Object.entries(query).forEach(([key, value]) => {
@@ -53,7 +90,7 @@ describe("SearchQueryBuilder", () => {
       expect(param).toStrictEqual([newValue]);
     });
 
-    it(`throws (or sets default) when setting invalid query param: ${key}`, () => {
+    it(`throws (or sets a default) when setting invalid query param: ${key}`, () => {
       let newValue: unknown;
 
       switch (key as keyof SearchQuery) {

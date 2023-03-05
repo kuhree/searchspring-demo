@@ -4,7 +4,7 @@
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
     "react",
-    "plugin:prettier/recommended"
+    "prettier"
   ],
   "plugins": ["@typescript-eslint"],
   "parser": "@typescript-eslint/parser",

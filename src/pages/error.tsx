@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useRouteError } from "react-router-dom";
 import { ErrorMessage } from "../components/error-message";
 
@@ -11,11 +12,14 @@ export function ErrorPage() {
           { cause: err }
         );
 
-  console.error(error);
+  useEffect(() => {
+    console.error(error);
+    // Other Error Handling: Sentry? Logs?
+  }, [error]);
 
   return (
     <ErrorMessage
-      summary="Sorry, an unexpected error has occured"
+      summary={error.message ?? "Sorry, an unexpected error has occured"}
       error={error}
     />
   );
