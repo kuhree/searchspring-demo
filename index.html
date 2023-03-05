@@ -3,16 +3,24 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Press+Start+2P"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Damion"
+    />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Searchpring Demo</title>
     <script>
-      const isLocal = localStorage.theme === "dark";
+      const isDarkStored = localStorage.theme === "dark";
 
-      const isSystem =
+      const isDarkPreferred =
         !("theme" in localStorage) &&
         window.matchMedia("(prefers-color-scheme: dark)").matches;
 
-      if (isLocal || isSystem) {
+      if (isDarkStored || isDarkPreferred) {
         document.documentElement.classList.add("dark");
       } else {
         document.documentElement.classList.remove("dark");

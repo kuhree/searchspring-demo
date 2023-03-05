@@ -1,26 +1,68 @@
 /* eslint-disable camelcase -- can't control db_data */
 
-import { PropsWithChildren } from "react";
+import { HTMLProps, PropsWithChildren } from "react";
+import { Form } from "../../components/form";
 import { mergeClass } from "../../utils/merge-class";
 import { SearchQueryResponse } from "./search-api";
 
-type SearchResultsProps = PropsWithChildren;
+type SearchResultsProps = PropsWithChildren<
+  Pick<HTMLProps<HTMLDivElement>, "className">
+>;
 
-function SearchContainer({ children }: SearchResultsProps) {
-  return <section>{children}</section>;
+function SearchContainer({ children, className }: SearchResultsProps) {
+  return (
+    <section
+      className={mergeClass(
+        "flex flex-col p-[5%]",
+        "lg:flex-row lg:items-start",
+        className
+      )}
+    >
+      {children}
+    </section>
+  );
 }
 
-type ResultGridProps = PropsWithChildren;
-function ResultsGrid({ children }: ResultGridProps) {
-  return <ul className="flex flex-wrap justify-center">{children}</ul>;
+type SearchNavProps = PropsWithChildren<
+  Pick<HTMLProps<HTMLDivElement>, "className">
+>;
+
+function SearchNav({ children, className }: SearchNavProps) {
+  return (
+    <aside
+      className={mergeClass(
+        "relative z-10 p-6 mb-8 flex-grow-0 xl:basis-2/6 text-center rounded-md shadow-md bg-muted border-2 border-accent",
+        "lg:sticky lg:top-[10%]",
+        className
+      )}
+    >
+      {children}
+    </aside>
+  );
 }
 
-type ResultItemProps = {
+type SearchContentProps = PropsWithChildren<
+  Pick<HTMLProps<HTMLDivElement>, "className">
+>;
+function SearchContent({ children, className }: SearchContentProps) {
+  return (
+    <div className={mergeClass("flex-grow-1 basis-5/6", className)}>
+      {children}
+    </div>
+  );
+}
+
+type CardGridProps = PropsWithChildren;
+function CardGrid({ children }: CardGridProps) {
+  return <ul className="flex flex-wrap justify-around">{children}</ul>;
+}
+
+type ProductCardProps = {
   item: SearchQueryResponse["results"][number];
 };
 
-function ResultsItem({ item }: ResultItemProps) {
-  const {
+function ProductCard({
+  item: {
     id,
     price,
     msrp,
@@ -33,67 +75,103 @@ function ResultsItem({ item }: ResultItemProps) {
     ratingCount,
     addToCartUrl,
     quantity_available,
-  } = item;
+  },
+}: ProductCardProps) {
+  const isOnSale = price < msrp;
 
-  const isOnSale = item.price < item.msrp;
   return (
     <li
       key={id}
       className={mergeClass(
-        "m-4 max-w-sm rounded-md overflow-hidden shadow-lg basis-full relative"
+        "product-card",
+        "relative basis-full shadow-md mx-2 mb-4 max-w-[16rem] flex flex-col backdrop-blur"
       )}
     >
-      <img src={thumbnailImageUrl} alt={name} className="w-full object-cover" />
+      <img
+        src={thumbnailImageUrl}
+        alt={name}
+        className={mergeClass("w-full object-cover")}
+      />
 
-      <div className="px-6 py-4 flex flex-col h-full">
-        <p className="text-gray-700">{brand}</p>
-        <p className="font-bold text-xl">{name}</p>
-
-        <div className="flex items-center my-4">
-          <span className="text-3xl font-bold mr-2">
-            ${parseFloat(price).toFixed(2)}
-          </span>
-
-          {isOnSale ? (
-            <span className="line-through text-gray-400">${msrp}</span>
-          ) : null}
+      <div
+        className={mergeClass(
+          "px-6 py-4 basis-full flex flex-col justify-between "
+        )}
+      >
+        <div>
+          <p className="text-accent font-cursive">{brand}</p>
+          <p className="font-bold font-accent text-sm">{name}</p>
         </div>
 
-        <a
-          aria-label="Add to Cart"
-          className="self-end  bg-teal-500 transition-colors hover:bg-teal-700 border-teal-500 hover:border-teal-700 text-sm border-4 text-white py-1 px-2 rounded"
-          href={addToCartUrl}
-        >
-          Add to Cart
-        </a>
+        <div>
+          <div className="flex items-center my-4">
+            <span className="text-xl font-bold">
+              ${parseFloat(price).toFixed(2)}
+            </span>
 
-        <details className="my-2 text-gray-700 absolute bottom-0 bg-white px-2 py-4 rounded">
-          <summary>More Info</summary>
+            {isOnSale ? (
+              <span className="mx-2 line-through text-red-600">${msrp}</span>
+            ) : null}
+          </div>
 
-          <p className="mb-2 text-base">{description}</p>
+          <details className="fill">
+            <summary className="text-muted text-sm" />
 
-          <p>
-            Condition:
-            <span className="font-semibold">{condition}</span>
-          </p>
-
-          <p>
-            Reviews: <span className="font-semibold">{ratingCount}</span>
-          </p>
-          <p>
-            In Stock:{" "}
-            <span className="font-semibold">{quantity_available}</span>
-          </p>
-          <p>
-            Popularity: <span className="font-semibold">{popularity}</span>
-          </p>
-        </details>
+            <ItemDetail label="Popularity">{popularity}</ItemDetail>
+            <ItemDetail label="Condition">{condition.join(", ")}</ItemDetail>
+            <ItemDetail label="Reviews">{ratingCount}</ItemDetail>
+            <ItemDetail label="In Stock">
+              {quantity_available.join(", ")}
+            </ItemDetail>
+            <ItemDetail childClassName="inline-block prose-base font-normal text-muted mt-2">
+              {description}
+            </ItemDetail>
+          </details>
+        </div>
       </div>
+
+      <Form.Submit
+        type="button"
+        className="block w-full shadow-small"
+        aria-label="Add to Cart"
+        href={addToCartUrl}
+      >
+        Add to Cart
+      </Form.Submit>
     </li>
   );
 }
 
-export const Search = Object.assign(SearchContainer, {
-  ResultsGrid,
-  ResultsItem,
-});
+type ItemDetailProps = PropsWithChildren<
+  HTMLProps<HTMLParagraphElement> & {
+    label?: string;
+    childClassName?: string;
+  }
+>;
+function ItemDetail({
+  children,
+  className,
+  childClassName,
+  label,
+  ...props
+}: ItemDetailProps) {
+  return (
+    <p {...props} className={mergeClass("text-muted", className)}>
+      {label ? <>{label}: </> : null}
+      <span className={mergeClass("font-semibold text-accent", childClassName)}>
+        {children}
+      </span>
+    </p>
+  );
+}
+
+export const Search = Object.assign(
+  {},
+  {
+    Container: SearchContainer,
+    Nav: SearchNav,
+    Content: SearchContent,
+    CardGrid,
+    Card: ProductCard,
+  }
+);

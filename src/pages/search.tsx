@@ -1,126 +1,125 @@
 import {
   Pagination,
+  PaginationProps,
   Search,
-  SearchForm,
   SearchQuery,
   SearchQueryBuilder,
+  SearchQueryResponse,
 } from "../features/search";
 import { ErrorMessage } from "../components/error-message";
 import { Form } from "../components/form";
-import { LoaderFunctionArgs, useLoaderData } from "react-router-dom";
+import {
+  LoaderFunctionArgs,
+  useLoaderData,
+  useNavigate,
+} from "react-router-dom";
+import { SiteConfig } from "../utils/site-config";
+import { PropsWithChildren, useEffect } from "react";
+import "./search.scss";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const requestUrl = new URL(request.url);
+  switch (request.method) {
+    case "GET":
+    default: {
+      const requestUrl = new URL(request.url);
+      const query = new SearchQueryBuilder(requestUrl.search);
+      const queryJson = query.build();
+      const queryUrl = query.toStringQuery();
 
-  const queryBuilder = new SearchQueryBuilder();
-  queryBuilder.url.search = requestUrl.search;
+      const response = await fetch(queryUrl);
+      if (!response.ok) {
+        throw new Error("An error occured while processing your search.", {
+          cause: response.json(),
+        });
+      }
 
-  const { query, url } = {
-    query: queryBuilder.build(),
-    url: queryBuilder.toString(),
-  };
+      const data = await response.json();
 
-  const result = await fetch(url)
-    .then((res) => res.json())
-    .catch((e) => console.error(e));
-
-  return { query, result };
+      return {
+        query: { json: queryJson, str: queryUrl },
+        data: data as SearchQueryResponse,
+      };
+    }
+  }
 }
 
 export function SearchPage() {
-  const { query, result } = useLoaderData();
+  const navigate = useNavigate();
+  let { query, data } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
+
+  const onPageSelect: PaginationProps["onPageSelect"] = (page) => {
+    const builder = new SearchQueryBuilder(window.location.search).setParam(
+      "page",
+      page
+    );
+
+    navigate(`/?${builder.toSearchParams()}`);
+  };
 
   return (
-    <>
-      <SearchForm initialQuery={query} />
+    <Search.Container>
+      <Search.Nav>
+        <h1>{SiteConfig.title}</h1>
+        <p className="text-xl mb-2 font-mono">{SiteConfig.description}</p>
 
-      {!result ? <Placeholder /> : null}
+        <SearchForm initialQuery={query.json} />
 
-      {result.length === 0 ? (
-        <ErrorMessage
-          error={new Error("Results are empty. Try another search.")}
-          summary={
-            "There doesn't appear to be any results for this query. Please try another search."
-          }
-        />
-      ) : null}
+        <Pagination pagination={data.pagination} onPageSelect={onPageSelect} />
+      </Search.Nav>
 
-      {result.length ? (
-        <Search>
-          <Pagination
-            pagination={query.pagination}
-            onPageSelect={onPageSelect}
+      <Search.Content>
+        {data && data.results.length === 0 ? (
+          <ErrorMessage
+            summary={"There doesn't appear to be any results for this query. "}
+            error={new Error("Results are empty. Try another search.")}
           />
+        ) : null}
 
-          <Search.ResultsGrid>
-            {query.results.map((item) => (
-              <Search.ResultsItem key={item.id} item={item} />
+        {data && data.results.length ? (
+          <Search.CardGrid>
+            {data.results.map((item) => (
+              <Search.Card key={item.id} item={item} />
             ))}
-          </Search.ResultsGrid>
+          </Search.CardGrid>
+        ) : null}
 
+        {data && data.pagination.totalPages ? (
           <Pagination
-            pagination={query.pagination}
+            pagination={data.pagination}
             onPageSelect={onPageSelect}
           />
-        </Search>
-      ) : null}
-    </>
+        ) : null}
+      </Search.Content>
+    </Search.Container>
   );
 }
 
-type PlaceholderProps = {
-  placeholders?: Record<
-    string,
-    Array<Pick<SearchQuery, "q"> & { label: string }>
-  >;
-};
+export type SearchFormProps = PropsWithChildren<{
+  initialQuery: SearchQuery;
+}>;
 
-function Placeholder({ placeholders = defaultPlaceholders }: PlaceholderProps) {
+export function SearchForm({ initialQuery }: SearchFormProps) {
+  useEffect(() => {
+    const input = document.getElementById("q") as HTMLInputElement | null;
+
+    if (input) {
+      input.value = initialQuery.q;
+    }
+  }, [initialQuery]);
+
   return (
-    <>
-      {Object.entries(placeholders).map(([title, list]) => (
-        <section key={title} className="mx-auto px-3">
-          <h2 className="text-2xl font-bold">{title}</h2>
+    <Form id="search-form" role="search" method="get" action="/">
+      <div className="flex items-center border-b border-accent py-2">
+        <Form.Input
+          id="q"
+          name="q"
+          placeholder="Search by product name, price, size, etc..."
+          aria-label="Search Products"
+          defaultValue={initialQuery.q}
+        />
 
-          {list.map((collection) => (
-            <Form>
-              <Form.Input
-                name="q"
-                hidden
-                aria-hidden
-                className="hidden"
-                defaultValue={collection.q}
-              />
-
-              <Form.Submit key={collection.q} type="button" className="m-2">
-                {collection.label}
-              </Form.Submit>
-            </Form>
-          ))}
-        </section>
-      ))}
-    </>
+        <Form.Submit type="submit">Search</Form.Submit>
+      </div>
+    </Form>
   );
 }
-
-const defaultPlaceholders: PlaceholderProps["placeholders"] = {
-  Seasons: [
-    { label: "Winter Collection", q: "winter" },
-    { label: "Fall Collection", q: "fall" },
-    { label: "Summer Collection", q: "summer" },
-    { label: "Spring Collection", q: "spring" },
-  ],
-
-  Clothing: [
-    { label: "Shop Jackets", q: "jackets" },
-    { label: "Shop Shirts", q: "shirts" },
-    { label: "Shop Pants", q: "pants" },
-    { label: "Shop Shorts", q: "shorts" },
-    { label: "Shop Shoes", q: "shoes" },
-  ],
-
-  Misc: [
-    { label: "Perfect your skincare routine", q: "skincare" },
-    { label: "Accessorize!", q: "jewelry" },
-  ],
-};
