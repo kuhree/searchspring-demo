@@ -77,7 +77,7 @@ export function HomePage() {
                   type="button"
                   to={`/search?q=${searchQuery}`}
                   className={mergeClass(
-                    "mx-4 mb-4 block bg-muted text-primary dark:font-accent text-sm p-2",
+                    "block flex-grow mx-4 mb-4 text-center bg-muted text-primary dark:font-accent text-sm p-2",
                     "hover:bg-accent",
                     "transition-colors"
                   )}
