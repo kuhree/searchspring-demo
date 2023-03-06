@@ -8,7 +8,7 @@ export const SiteConfig = {
   description: "Search for your favorite clothes, gear, and accessories.",
   logo: { src: "vite.svg", alt: "Vite Logo" },
   socials: [
-    ["gh", "https://github.com/kuhree"],
+    ["gh", "https://github.com/kuhree/searchspring-demo"],
     ["tw", "https://twitter.com/kuhreee"],
     ["li", "https://linkedin.com/in/khari-johnson"],
   ],
