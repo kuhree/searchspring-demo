@@ -10,14 +10,10 @@
 ## Usage
 
 - Configuration
-  - Certain properties (title, description, socials) can be managed using the [SiteConfig](site-config)
+  - Certain properties (title, description, socials) can be managed using the [SiteConfig][site-config]
 - Styling - tailwind, scsss, and css custom-properties
-  - Manage your themes in [the root stylesheet](index-stylesheet) and the [tailwind-config](tailwind-config)
+  - Manage your themes in [the root stylesheet][index-stylesheet] and the [tailwind-config][tailwind-config]
   - Most custom components still support a `className` to help you style them further
-
-[site-config]: src/utils/site-config.ts
-[index-stylesheet]: src/styles/index.scss
-[tailwind-config]: tailwind.config.cjs
 
 ## Requirements
 
@@ -61,3 +57,7 @@ Yours does not need to be as involved, but we would like to see what you come up
 - If you want to see an example of what a full integration looks like see the following links.
   - https://condescending-bassi-4d660a.netlify.app/
   - https://shopily.netlify.app/
+
+[site-config]: ./src/utils/site-config.ts
+[index-stylesheet]: ./src/styles/index.scss
+[tailwind-config]: ./tailwind.config.cjs
