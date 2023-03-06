@@ -15,7 +15,7 @@ import {
 } from "react-router-dom";
 import { SiteConfig } from "../utils/site-config";
 import { PropsWithChildren, useEffect } from "react";
-import "./search.scss";
+import "../styles/search.scss";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   switch (request.method) {

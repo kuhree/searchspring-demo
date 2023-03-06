@@ -4,8 +4,20 @@
 
 - Install deps: `pnpm install`
 - Run dev server: `pnpm serve`
-- Run quality and test: `pnpm format/lint/test`
+- Run quality and test: `pnpm [format,lint,test]`
 - Build for production: `pnpm build`
+
+## Usage
+
+- Configuration
+  - Certain properties (title, description, socials) can be managed using the [SiteConfig](site-config)
+- Styling - tailwind, scsss, and css custom-properties
+  - Manage your themes in [the root stylesheet](index-stylesheet) and the [tailwind-config](tailwind-config)
+  - Most custom components still support a `className` to help you style them further
+
+[site-config]: src/utils/site-config.ts
+[index-stylesheet]: src/styles/index.scss
+[tailwind-config]: tailwind.config.cjs
 
 ## Requirements
 
@@ -20,10 +32,10 @@
         If you’re on the last page you shouldn’t show the next button or it should be disabled.
 - [x] You’ll be able to change the page by making another request to our Search API with the “page” parameter set to the page you’d like to request.
 
-## Addons
+### Addons
 
-- [ ] Add router
-  - [ ] Sync search to url for shareable searches
+- [x] Add router
+  - [x] Sync search to url for shareable searches
 - [ ] Advanced Search
   - [ ] In-Query Refinement
   - [ ] Implement Filters
@@ -31,13 +43,13 @@
 - [ ] Search history
 - [ ] More themes
 
-## Bugs
+### Known Bugs
 
-- [ ] Query is not always synced to the form
-- [ ] Improve ResultsGrid and ResultItem display
+- [x] Query is not always synced to the form
+- [x] Improve ResultsGrid and ResultItem display
 - [ ] Theming
   - [ ] Change logo and favicon
-  - [ ] Implement dark theme
+  - [x] Implement dark theme
 
 ### Resources
 
