@@ -1,5 +1,21 @@
 # Searchspring Demo
 
+## Technologies
+
+- Typescript
+  - Zod
+- Vite
+  - Vitest
+- React
+  - React-router
+  - React-icons
+- Tailwindcss
+  - SCSS
+- Eslint
+  - Typescript-eslint
+  - Prettier
+- Github Actions
+
 ## Getting started
 
 - Install deps: `pnpm install`
