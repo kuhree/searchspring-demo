@@ -61,7 +61,9 @@ export function SearchPage() {
     <Search.Container>
       <Search.Nav>
         <h1 className="blinky">{SiteConfig.title}</h1>
-        <p className="mb-2 dark:font-mono">{SiteConfig.description}</p>
+        <p className="mb-2 dark:font-mono max-w-prose mx-auto">
+          {SiteConfig.description}
+        </p>
 
         <SearchForm initialQuery={query.json} />
 

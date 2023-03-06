@@ -12,6 +12,11 @@ export const SiteConfig = {
     ["tw", "https://twitter.com/kuhreee"],
     ["li", "https://linkedin.com/in/khari-johnson"],
   ],
+
+  products: {
+    trendingCount: 10,
+    pageRange: 2,
+  },
 } as const;
 
 export type SocailKeys = SiteConfig["socials"][number][0];

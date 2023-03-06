@@ -1,5 +1,6 @@
 import { HTMLProps, PropsWithChildren } from "react";
 import { mergeClass } from "../../utils/merge-class";
+import { SiteConfig } from "../../utils/site-config";
 import { SearchQueryResponse } from "./search-api";
 
 export type PaginationProps = {
@@ -14,7 +15,7 @@ export function Pagination({
   container,
   pagination,
   onPageSelect,
-  range = 2,
+  range = SiteConfig.products.pageRange,
 }: PaginationProps) {
   const {
     totalResults = 0,
