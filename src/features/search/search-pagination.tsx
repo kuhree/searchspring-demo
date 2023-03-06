@@ -120,7 +120,7 @@ export function Pagination({
         ) : null}
       </ul>
 
-      <span className="text-xs">
+      <span className="text-xs dark:font-mono">
         Showing <HelpText>{begin}</HelpText> to <HelpText>{end}</HelpText> of{" "}
         <HelpText>{totalResults}</HelpText> Entries
       </span>

@@ -67,15 +67,19 @@ function ProductCard({
     price,
     msrp,
     thumbnailImageUrl,
+    color,
     name,
+    material,
     brand,
     description,
-    popularity,
     condition,
     ratingCount,
     addToCartUrl,
     keywords,
     quantity_available,
+    days_since_published,
+    sku,
+    size,
   },
 }: ProductCardProps) {
   const isOnSale = price < msrp;
@@ -122,29 +126,35 @@ function ProductCard({
 
           <details className="fill">
             <summary className="text-muted text-sm" />
+            <ItemDetail childClassName="inline-block prose-base font-normal text-muted mb-2">
+              {description}
+            </ItemDetail>
 
-            <ItemDetail label="Popularity">{popularity}</ItemDetail>
+            <ItemDetail label="Last Updated">
+              {days_since_published}d
+            </ItemDetail>
+            <ItemDetail label="SKU">{sku}</ItemDetail>
             <ItemDetail label="Condition">{condition.join(", ")}</ItemDetail>
             <ItemDetail label="Reviews">{ratingCount}</ItemDetail>
             <ItemDetail label="In Stock">
               {quantity_available.join(", ")}
             </ItemDetail>
-            <ItemDetail label="Keywords">{keywords?.join(", ")}</ItemDetail>
-            <ItemDetail childClassName="inline-block prose-base font-normal text-muted mt-2">
-              {description}
-            </ItemDetail>
+            {color?.length ? (
+              <ItemDetail label="Colors">{color?.join(", ")}</ItemDetail>
+            ) : null}
+            {size?.length ? (
+              <ItemDetail label="Sizes">{size?.join(", ")}</ItemDetail>
+            ) : null}
+            {material?.length ? (
+              <ItemDetail label="Materials">{material?.join(", ")}</ItemDetail>
+            ) : null}
+
+            {keywords?.length ? (
+              <ItemDetail label="Keywords">{keywords?.join(", ")}</ItemDetail>
+            ) : null}
           </details>
         </div>
       </div>
-
-      <Form.Submit
-        type="button"
-        className="w-full shadow-small flex items-center justify-around"
-        aria-label="Add to Cart"
-        href={addToCartUrl}
-      >
-        Add to Cart
-      </Form.Submit>
     </li>
   );
 }

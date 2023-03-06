@@ -34,7 +34,7 @@ function HeaderContainer({ children, className }: HeaderProps) {
   return (
     <header
       className={mergeClass(
-        "flex items-center justify-between py-2 px-[5%] shadow-xl z-50",
+        "flex items-center justify-between py-2 px-[5%] shadow-xl z-50 bg-primary",
         className,
         stateClass
       )}
