@@ -22,7 +22,15 @@ function AppHeader() {
         <Header.NavListItem>
           <Header.NavLink to="/search">search</Header.NavLink>
         </Header.NavListItem>
+      </Header.NavList>
+    </Header>
+  );
+}
 
+function AppFooter() {
+  return (
+    <footer className="flex items-center justify-around py-4">
+      <Header.NavList>
         {SiteConfig.socials.map(([site, href]) => (
           <Header.NavListItem key={site}>
             <Header.NavLink key={site} href={href}>
@@ -32,7 +40,7 @@ function AppHeader() {
           </Header.NavListItem>
         ))}
       </Header.NavList>
-    </Header>
+    </footer>
   );
 }
 
@@ -44,6 +52,8 @@ export function AppRoot() {
       <main>
         <Outlet />
       </main>
+
+      <AppFooter />
     </>
   );
 }

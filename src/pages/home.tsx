@@ -16,7 +16,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         })
           .setParam("siteId", SiteConfig.id)
           // @ts-expect-error -- limit is not part of a SearchQuery
-          .setParam("limit", 10);
+          .setParam("limit", SiteConfig.products.trendingCount);
 
         return builder.toStringQuery();
       })();
@@ -53,10 +53,12 @@ export function HomePage() {
   } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
 
   return (
-    <Search.Container className="lg:flex-col">
+    <Search.Container className="max-w-screen-lg mx-auto lg:flex-col">
       <Search.Nav className="w-full">
         <h1 className="blinky">Trendspring</h1>
-        <p className="mb-2 dark:font-mono">See what's popular</p>
+        <p className="mb-2 dark:font-mono max-w-prose mx-auto">
+          See the most popular searches for your store in the last 30 days.
+        </p>
 
         <SearchForm initialQuery={new SearchQueryBuilder().build()} />
       </Search.Nav>
@@ -77,7 +79,7 @@ export function HomePage() {
                   type="button"
                   to={`/search?q=${searchQuery}`}
                   className={mergeClass(
-                    "block flex-grow mx-4 mb-4 text-center bg-muted text-primary dark:font-accent text-sm p-2",
+                    "block flex-grow mx-2 mb-4 p-2 text-center bg-muted text-primary dark:font-accent dark:text-sm",
                     "hover:bg-accent",
                     "transition-colors"
                   )}
