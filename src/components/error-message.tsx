@@ -15,21 +15,19 @@ export function ErrorMessage({ summary, error }: ErrorMessageProps) {
         </summary>
 
         {/* eslint-disable-next-line -- process is definitely defined */}
-        {process.env.NODE_ENV !== "production" ? (
-          <div className="relative m-4 p-4 text-left text-muted bg-muted border-2 border-accent">
-            <ErrorBoard summary="Cause">
-              {error.cause instanceof Error ? (
-                <ErrorMessage error={error.cause} />
-              ) : (
-                <pre className="whitespace-pre-wrap my-2 bg-primary p-4">
-                  {JSON.stringify(error?.cause)}
-                </pre>
-              )}
-            </ErrorBoard>
+        <div className="relative m-4 p-4 text-left text-muted bg-muted border-2 border-accent">
+          <ErrorBoard summary="Cause">
+            {error.cause instanceof Error ? (
+              <ErrorMessage error={error.cause} />
+            ) : (
+              <pre className="whitespace-pre-wrap my-2 bg-primary p-4">
+                {JSON.stringify(error?.cause)}
+              </pre>
+            )}
+          </ErrorBoard>
 
-            <ErrorBoard summary="Trace">{error?.stack}</ErrorBoard>
-          </div>
-        ) : null}
+          <ErrorBoard summary="Trace">{error?.stack}</ErrorBoard>
+        </div>
       </details>
     );
   }

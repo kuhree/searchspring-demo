@@ -12,7 +12,7 @@ const SocialMap: Record<SocailKeys, ReactNode> = {
 
 function AppHeader() {
   return (
-    <Header className="sticky top-0 bg-muted">
+    <Header className="sticky top-0">
       <Header.ThemeToggle />
 
       <Header.NavList>

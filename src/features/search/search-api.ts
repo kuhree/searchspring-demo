@@ -73,35 +73,13 @@ export type SearchQueryResponse = {
   results: Array<SearchResult>;
 };
 
-// type NonEmptyString = z.infer<typeof NonEmptyStringSchema>;
-// const NonEmptyStringSchema = z.string().min(1);
-
-// type ListTupleItem = z.infer<ListTupleItem>;
-// const ListTupleItemSchema = z.tuple([
-//   NonEmptyStringSchema,
-//   NonEmptyStringSchema,
-// ]);
-
-// type ListParam = z.infer<typeof ListParamSchema>;
-// const ListParamSchema = z.array(ListTupleItemSchema);
-
 export type SearchQuery = z.infer<typeof SearchQuerySchema>;
 const SearchQuerySchema = z.object({
   q: z.string().default(""),
   page: z.number().min(1).default(1),
   resultsFormat: z.enum(["native"]).default("native"),
   siteId: z.string().min(4).default(SiteConfig.id),
-  // filter: ListParamSchema.default([]),
-  // sort: ListParamSchema.default([]),
 });
-
-// export type AdvancedSearchQueryParams = z.infer<
-//   typeof AdvancedSearchQuerySchema
-// >;
-// const AdvancedSearchQuerySchema = SearchQuerySchema.pick({
-//   filter: true,
-//   sort: true,
-// });
 
 export type NetworkConfig = z.infer<typeof NetworkConfigSchema>;
 const NetworkConfigSchema = z.object({
@@ -139,83 +117,25 @@ export class SearchQueryBuilder {
     }
   }
 
-  setParam(
-    name: keyof SearchQuery,
-    // rawValue: string | [keyof AdvancedSearchQueryParams, string]
-    rawValue: SearchQuery[typeof name]
-  ) {
-    const parsedValue = z
-      .string()
-      .or(z.number())
-      // .or(ListTupleItemSchema)
-      .parse(rawValue);
-
-    // if (isArray(parsedValue)) {
-    //   const [listKey, listValue] = parsedValue;
-    //
-    //   const id = `${name}.${listKey}`;
-    //
-    //   this.url.searchParams.set(id, listValue);
-    // } else {
+  setParam(name: keyof SearchQuery, rawValue: SearchQuery[typeof name]) {
+    const parsedValue = z.string().or(z.number()).parse(rawValue);
     this.url.searchParams.set(name, String(parsedValue));
-    // }
 
     return this;
   }
 
   getParam(name: keyof SearchQuery) {
-    switch (name) {
-      // case "sort":
-      // case "filter": {
-      //   const keyList = Array.from(this.url.searchParams.keys()).filter((key) =>
-      //     key.startsWith(`${name}.`)
-      //   );
-      //   return keyList.flatMap((key) => this.url.searchParams.getAll(key));
-      // }
-
-      default: {
-        return this.url.searchParams.getAll(name);
-      }
-    }
+    return this.url.searchParams.getAll(name);
   }
 
   deleteParam(name: keyof SearchQuery) {
-    const mutation = () => {
-      switch (name) {
-        // case "sort":
-        // case "filter": {
-        //   const listKey = name.split(".")[0];
-        //   const id = `${name}.${listKey}`;
-        //   if (this.url.searchParams.has(id)) {
-        //     this.url.searchParams.delete(id);
-        //   }
-        // }
-
-        default: {
-          this.url.searchParams.delete(name);
-        }
-      }
-    };
-
-    mutation();
-    return this;
+    this.url.searchParams.delete(name);
   }
 
   build(): SearchQuery {
-    // Create a params object
     const params: Record<string, unknown> = {};
-    this.url.searchParams.forEach((value, key) => {
-      // if (key.startsWith("sort") || key.startsWith("filter")) {
-      //   const [name, listKey] = key.split(".")[0];
-      //
-      //   const listRef = params[name];
-      //   if (name in query && isArray(listRef)) {
-      //     listRef.push([listKey, val]);
-      //   } else {
-      //     params[name] = [[listKey, val]];
-      //   }
-      // } else
 
+    this.url.searchParams.forEach((value, key) => {
       if (key === "page") {
         params[key] = Number(value);
       } else {
@@ -236,7 +156,3 @@ export class SearchQueryBuilder {
     return this.url.searchParams.toString();
   }
 }
-
-// function isArray(value: unknown): value is Array<unknown> {
-//   return Array.isArray(value);
-// }
