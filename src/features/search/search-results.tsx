@@ -1,7 +1,6 @@
 /* eslint-disable camelcase -- can't control db_data */
 
 import { HTMLProps, PropsWithChildren } from "react";
-import { Form } from "../../components/form";
 import { mergeClass } from "../../utils/merge-class";
 import { SearchQueryResponse } from "./search-api";
 

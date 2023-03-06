@@ -27,14 +27,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
       const queryJson = query.build();
       const queryUrl = query.toStringQuery();
 
-      const response = await fetch(queryUrl);
-      if (!response.ok) {
+      const seachResponse = await fetch(queryUrl);
+      if (!seachResponse.ok) {
         throw new Error("An error occured while processing your search.", {
-          cause: response.json(),
+          cause: seachResponse.json(),
         });
       }
 
-      const data = await response.json();
+      const data = await seachResponse.json();
 
       return {
         query: { json: queryJson, str: queryUrl },
@@ -54,7 +54,7 @@ export function SearchPage() {
       page
     );
 
-    navigate(`/?${builder.toSearchParams()}`);
+    navigate(`/search?${builder.toSearchParams()}`);
   };
 
   return (
@@ -126,7 +126,7 @@ export function SearchForm({ initialQuery }: SearchFormProps) {
   }, [initialQuery]);
 
   return (
-    <Form id="search-form" role="search" method="get" action="/">
+    <Form id="search-form" role="search" method="get" action="/search">
       <div className="flex items-center border-b border-accent py-2">
         <Form.Input
           id="q"
