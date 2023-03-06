@@ -118,7 +118,7 @@ export class SearchQueryBuilder {
   ) {
     const {
       path = "/api/search/search.json",
-      url = `http://api.searchspring.net`,
+      url = `https://api.searchspring.net`,
     } = network ?? {};
 
     this.url = new URL(path, url);
