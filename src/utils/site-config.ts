@@ -1,15 +1,17 @@
-/* eslint-disable no-use-before-define -- as const === type */
+/* eslint-disable no-redeclare -- as const === type */
 
-export type SiteConfigSchema = typeof SiteConfig;
+export type SiteConfig = typeof SiteConfig;
 export const SiteConfig = {
   id: "scmq7n",
 
-  title: "Searchspring Demo",
+  title: "Searchspring",
   description: "Search for your favorite clothes, gear, and accessories.",
   logo: { src: "vite.svg", alt: "Vite Logo" },
-  social: [
+  socials: [
     ["gh", "https://github.com/kuhree"],
     ["tw", "https://twitter.com/kuhreee"],
     ["li", "https://linkedin.com/in/khari-johnson"],
   ],
 } as const;
+
+export type SocailKeys = SiteConfig["socials"][number][0];

@@ -20,27 +20,14 @@ export function Pagination({
     totalResults = 0,
     currentPage = 0,
     totalPages = 0,
-    perPage = 0,
+    begin = 0,
+    end = 0,
   } = pagination;
 
   const { firstPage, previousPages, nextPages, lastPage } = getPageRanges({
-    totalPages,
-    currentPage,
+    ...pagination,
     range,
   });
-
-  const [entriesStart, entriesEnd] = (() => {
-    const start = currentPage * perPage - perPage;
-
-    let end = start + perPage - 1;
-    if (end > totalResults) {
-      end = totalResults;
-    } else if (end < 0) {
-      end = 0;
-    }
-
-    return [start, end];
-  })();
 
   const makeOnPageClickHandler = (page: number) => {
     return () => onPageSelect(page);
@@ -55,6 +42,15 @@ export function Pagination({
       )}
     >
       <ul className="inline-flex items-center -space-x-px">
+        {firstPage ? (
+          <PageItem
+            onClick={makeOnPageClickHandler(firstPage)}
+            disabled={false}
+          >
+            First
+          </PageItem>
+        ) : null}
+
         <PageItem
           onClick={makeOnPageClickHandler(currentPage - 1)}
           disabled={currentPage === 1}
@@ -75,18 +71,6 @@ export function Pagination({
           </svg>
         </PageItem>
 
-        {firstPage ? (
-          <>
-            <PageItem
-              onClick={makeOnPageClickHandler(firstPage)}
-              disabled={false}
-            >
-              {firstPage}
-            </PageItem>
-            <PageItem disabled>...</PageItem>
-          </>
-        ) : null}
-
         {previousPages.map((page) => (
           <PageItem
             key={page}
@@ -97,9 +81,7 @@ export function Pagination({
           </PageItem>
         ))}
 
-        <PageItem disabled className="text-accent font-bold">
-          {currentPage}
-        </PageItem>
+        <PageItem disabled>{currentPage}</PageItem>
 
         {nextPages.map((page) => (
           <PageItem
@@ -110,19 +92,6 @@ export function Pagination({
             {page}
           </PageItem>
         ))}
-
-        {lastPage ? (
-          <>
-            <PageItem disabled>...</PageItem>
-            <PageItem
-              className="text-muted"
-              onClick={makeOnPageClickHandler(lastPage)}
-              disabled={false}
-            >
-              {lastPage}
-            </PageItem>
-          </>
-        ) : null}
 
         <PageItem
           onClick={makeOnPageClickHandler(currentPage + 1)}
@@ -143,11 +112,16 @@ export function Pagination({
             />
           </svg>
         </PageItem>
+
+        {lastPage ? (
+          <PageItem onClick={makeOnPageClickHandler(lastPage)} disabled={false}>
+            Last
+          </PageItem>
+        ) : null}
       </ul>
 
       <span className="text-xs">
-        Showing <HelpText>{entriesStart}</HelpText> to{" "}
-        <HelpText>{entriesEnd >= 0 ? entriesEnd : 0}</HelpText> of{" "}
+        Showing <HelpText>{begin}</HelpText> to <HelpText>{end}</HelpText> of{" "}
         <HelpText>{totalResults}</HelpText> Entries
       </span>
     </nav>
@@ -163,7 +137,7 @@ function PageItem({ children, onClick, disabled, className }: PageProps) {
     <li>
       <button
         className={mergeClass(
-          "px-1 py-1 leading-tight font-cursive text-2xl",
+          "px-1 py-1 leading-tight dark:font-mono",
           disabled ? "text-muted" : "text-accent hover:text-accent",
           className
         )}
@@ -180,7 +154,7 @@ type HelpTextProps = PropsWithChildren;
 
 function HelpText({ children }: HelpTextProps) {
   return (
-    <span className="font-semibold text-accent text-xl font-cursive">
+    <span className="font-semibold text-accent dark:text-xl dark:font-cursive">
       {children}
     </span>
   );

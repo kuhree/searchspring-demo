@@ -52,7 +52,7 @@ html {
 
 h1,
 .h1 {
-  @apply text-3xl xl:text-6xl font-bold dark:font-accent text-accent transition;
+  @apply text-3xl leading-relaxed font-bold dark:font-accent text-accent transition;
 }
 
 .blinky {

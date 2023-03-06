@@ -36,8 +36,8 @@ function Submit({ className, type = "submit", ...props }: SubmitProps) {
       type={type}
       className={mergeClass(
         "flex-shrink-0 bg-muted text-primary dark:font-accent text-sm p-2",
-        "hover:bg-accent",
-        "focus:bg-accent",
+        "hover:bg-accent hover:scale-105",
+        "focus:border-accent",
         "transition-colors",
         className
       )}

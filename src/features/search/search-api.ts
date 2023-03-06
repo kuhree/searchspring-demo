@@ -10,7 +10,6 @@ interface SearchResultDisplay {
   condition: Array<string>;
   description: string;
   imageUrl: string;
-  keywords: Array<string>;
   material: Array<string>;
   multi_colors: Array<string>;
   msrp: string;
@@ -19,6 +18,7 @@ interface SearchResultDisplay {
   size: Array<string>;
   title: Array<string>;
   thumbnailImageUrl: string;
+  keywords?: Array<string>;
 }
 
 interface SearchResultIdentity {

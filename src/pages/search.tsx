@@ -15,6 +15,7 @@ import {
 } from "react-router-dom";
 import { SiteConfig } from "../utils/site-config";
 import { PropsWithChildren, useEffect } from "react";
+import { MdSearch } from "react-icons/md";
 import "../styles/search.scss";
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -59,12 +60,29 @@ export function SearchPage() {
   return (
     <Search.Container>
       <Search.Nav>
-        <h1>{SiteConfig.title}</h1>
-        <p className="text-xl mb-2 dark:font-mono">{SiteConfig.description}</p>
+        <h1 className="blinky">{SiteConfig.title}</h1>
+        <p className="mb-2 dark:font-mono">{SiteConfig.description}</p>
 
         <SearchForm initialQuery={query.json} />
 
         <Pagination pagination={data.pagination} onPageSelect={onPageSelect} />
+
+        <details className="fill text-left">
+          <summary className="text-sm" />
+
+          <details>
+            <summary>View Query</summary>
+
+            <pre>JSON: {JSON.stringify(query.json, null, 2)}</pre>
+            <pre className="whitespace-pre-wrap">Query: {query.str}</pre>
+          </details>
+
+          <details>
+            <summary>View Data</summary>
+
+            <pre>{JSON.stringify(data, null, 2)}</pre>
+          </details>
+        </details>
       </Search.Nav>
 
       <Search.Content>
@@ -118,7 +136,10 @@ export function SearchForm({ initialQuery }: SearchFormProps) {
           defaultValue={initialQuery.q}
         />
 
-        <Form.Submit type="submit">Search</Form.Submit>
+        <Form.Submit type="submit">
+          <span className="sr-only">Search</span>
+          <MdSearch />
+        </Form.Submit>
       </div>
     </Form>
   );
