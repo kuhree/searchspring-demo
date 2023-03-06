@@ -19,6 +19,9 @@ function AppHeader() {
         <Header.NavListItem>
           <Header.NavLink to="/">home</Header.NavLink>
         </Header.NavListItem>
+        <Header.NavListItem>
+          <Header.NavLink to="/search">search</Header.NavLink>
+        </Header.NavListItem>
 
         {SiteConfig.socials.map(([site, href]) => (
           <Header.NavListItem key={site}>

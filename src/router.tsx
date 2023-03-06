@@ -1,8 +1,8 @@
 import { createBrowserRouter } from "react-router-dom";
 import { ErrorPage } from "./pages/error";
-
-import { AppRoot } from "./pages/root";
+import { HomePage, loader as homeLoader } from "./pages/home";
 import { SearchPage, loader as searchLoader } from "./pages/search";
+import { AppRoot } from "./pages/root";
 
 export const router = createBrowserRouter(
   [
@@ -16,6 +16,11 @@ export const router = createBrowserRouter(
           children: [
             {
               index: true,
+              element: <HomePage />,
+              loader: homeLoader,
+            },
+            {
+              path: "/search",
               element: <SearchPage />,
               loader: searchLoader,
             },

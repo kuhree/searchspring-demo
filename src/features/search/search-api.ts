@@ -83,7 +83,7 @@ const SearchQuerySchema = z.object({
 
 export type NetworkConfig = z.infer<typeof NetworkConfigSchema>;
 const NetworkConfigSchema = z.object({
-  url: z.string().url(),
+  url: z.string().url().optional(),
   path: z.string().min(1).optional(),
 });
 
