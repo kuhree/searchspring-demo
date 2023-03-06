@@ -74,6 +74,7 @@ function ProductCard({
     condition,
     ratingCount,
     addToCartUrl,
+    keywords,
     quantity_available,
   },
 }: ProductCardProps) {
@@ -87,11 +88,16 @@ function ProductCard({
         "relative basis-full shadow-md mx-2 mb-4 max-w-[16rem] flex flex-col backdrop-blur"
       )}
     >
-      <img
-        src={thumbnailImageUrl}
-        alt={name}
-        className={mergeClass("w-full object-cover")}
-      />
+      <div className={mergeClass("w-full basis-1/2")}>
+        <img
+          src={thumbnailImageUrl}
+          alt={name}
+          className={mergeClass("w-full h-full object-cover")}
+          onError={(e) => {
+            e.currentTarget.src = "/vite.svg";
+          }}
+        />
+      </div>
 
       <div
         className={mergeClass(
@@ -99,7 +105,7 @@ function ProductCard({
         )}
       >
         <div>
-          <p className="text-accent font-cursive">{brand}</p>
+          <p className="text-accent dark:font-cursive">{brand}</p>
           <p className="font-bold dark:font-accent text-sm">{name}</p>
         </div>
 
@@ -123,6 +129,7 @@ function ProductCard({
             <ItemDetail label="In Stock">
               {quantity_available.join(", ")}
             </ItemDetail>
+            <ItemDetail label="Keywords">{keywords?.join(", ")}</ItemDetail>
             <ItemDetail childClassName="inline-block prose-base font-normal text-muted mt-2">
               {description}
             </ItemDetail>
@@ -132,7 +139,7 @@ function ProductCard({
 
       <Form.Submit
         type="button"
-        className="block w-full shadow-small"
+        className="w-full shadow-small flex items-center justify-around"
         aria-label="Add to Cart"
         href={addToCartUrl}
       >

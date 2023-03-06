@@ -65,14 +65,14 @@ type NavProps = PropsWithChildren;
 function NavList({ children }: NavProps) {
   return (
     <nav>
-      <ul className="flex">{children}</ul>
+      <ul className="flex items-center">{children}</ul>
     </nav>
   );
 }
 
 type NavItemProps = PropsWithChildren;
 function NavListItem({ children }: NavItemProps) {
-  return <li className="mx-1">{children}</li>;
+  return <li className="mx-1 flex items-center">{children}</li>;
 }
 
 type NavLinkProps = PropsWithChildren<
@@ -80,20 +80,30 @@ type NavLinkProps = PropsWithChildren<
 >;
 
 function NavLink({ children, className, ...props }: NavLinkProps) {
-  const makeNavListClassName: RRNavLinkProps["className"] = (args) => {
+  const baseClass = mergeClass(
+    "transition-colors px-2 py-1",
+    "hover:text-accent hover:scale-110"
+  );
+
+  const withActiveClassName: RRNavLinkProps["className"] = (args) => {
     const { isActive, isPending } = args;
 
     return mergeClass(
-      `${isActive ? "text-accent" : ""} ${isPending ? "text-muted" : ""}`,
-      typeof className === "function" ? className(args) : className
+      baseClass,
+      typeof className === "function" ? className(args) : className,
+      `${isActive ? "text-accent" : ""} ${isPending ? "text-muted" : ""}`
     );
   };
 
   if ("href" in props && props.href) {
-    return <a {...props}>{children}</a>;
+    return (
+      <a className={baseClass} {...props}>
+        {children}
+      </a>
+    );
   } else if ("to" in props && props.to) {
     return (
-      <RRNavLink className={makeNavListClassName} {...props}>
+      <RRNavLink className={withActiveClassName} {...props}>
         {children}
       </RRNavLink>
     );

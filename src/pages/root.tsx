@@ -1,6 +1,14 @@
 import { Header } from "../components/header";
 import { Outlet } from "react-router-dom";
-import { SiteConfig } from "../utils/site-config";
+import { SiteConfig, SocailKeys } from "../utils/site-config";
+import { FaGithub, FaLinkedin, FaTwitter } from "react-icons/fa";
+import { ReactNode } from "react";
+
+const SocialMap: Record<SocailKeys, ReactNode> = {
+  gh: <FaGithub />,
+  li: <FaLinkedin />,
+  tw: <FaTwitter />,
+};
 
 function AppHeader() {
   return (
@@ -12,10 +20,11 @@ function AppHeader() {
           <Header.NavLink to="/">home</Header.NavLink>
         </Header.NavListItem>
 
-        {SiteConfig.social.map(([site, href]) => (
+        {SiteConfig.socials.map(([site, href]) => (
           <Header.NavListItem key={site}>
             <Header.NavLink key={site} href={href}>
-              {site}
+              <span className="sr-only">{site}</span>
+              {SocialMap[site]}
             </Header.NavLink>
           </Header.NavListItem>
         ))}
