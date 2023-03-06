@@ -8,6 +8,7 @@
     "lint": "eslint --ext .ts,tsx --ignore-path .gitignore .",
     "format": "prettier -u --write --ignore-path .gitignore \"**/*.{js,ts,tsx,css,html}\"",
     "test": "vitest",
+    "test:coverage": "vitest run --coverage",
     "serve": "vite",
     "serve:preview": "vite preview",
     "serve:prod": "pnpm build && pnpm dlx serve dist"
