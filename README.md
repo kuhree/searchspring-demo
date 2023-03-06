@@ -36,16 +36,21 @@
   - [ ] In-Query Refinement
   - [ ] Implement Filters
   - [ ] Implement Sort
-- [ ] Search history
+  - [ ] Search history
 - [ ] More themes
 
 ### Known Bugs
 
 - [x] Query is not always synced to the form
 - [x] Improve ResultsGrid and ResultItem display
-- [ ] Theming
-  - [ ] Change logo and favicon
+- [x] Theming
   - [x] Implement dark theme
+
+### Future Improvements
+
+- [ ] Re-implement SearchQueryBuilder for other queries like `trending` and `best-selling`.
+  - [ ] Allow for a schema to be passed in that defines what to build and params to set.
+- [ ] UI testing w/ playwright
 
 ### Resources
 
