@@ -60,7 +60,7 @@ export function SearchPage() {
     <Search.Container>
       <Search.Nav>
         <h1>{SiteConfig.title}</h1>
-        <p className="text-xl mb-2 font-mono">{SiteConfig.description}</p>
+        <p className="text-xl mb-2 dark:font-mono">{SiteConfig.description}</p>
 
         <SearchForm initialQuery={query.json} />
 

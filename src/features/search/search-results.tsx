@@ -100,7 +100,7 @@ function ProductCard({
       >
         <div>
           <p className="text-accent font-cursive">{brand}</p>
-          <p className="font-bold font-accent text-sm">{name}</p>
+          <p className="font-bold dark:font-accent text-sm">{name}</p>
         </div>
 
         <div>

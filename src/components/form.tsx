@@ -19,7 +19,7 @@ function Input({ className, name, ...props }: InputProps) {
     <input
       name={name}
       className={mergeClass(
-        "appearance-none bg-transparent border-none font-mono w-full mr-3 py-1 px-2 leading-tight",
+        "appearance-none bg-transparent border-none dark:font-mono w-full mr-3 py-1 px-2 leading-tight",
         className
       )}
       {...props}
@@ -35,7 +35,7 @@ function Submit({ className, type = "submit", ...props }: SubmitProps) {
     <button
       type={type}
       className={mergeClass(
-        "flex-shrink-0 bg-muted text-primary font-accent text-sm p-2",
+        "flex-shrink-0 bg-muted text-primary dark:font-accent text-sm p-2",
         "hover:bg-accent",
         "focus:bg-accent",
         "transition-colors",
