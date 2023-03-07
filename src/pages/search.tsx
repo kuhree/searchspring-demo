@@ -1,3 +1,13 @@
+import { PropsWithChildren, useEffect } from "react";
+import { MdSearch } from "react-icons/md";
+import {
+  LoaderFunctionArgs,
+  useLoaderData,
+  useNavigate,
+} from "react-router-dom";
+
+import { ErrorMessage } from "../components/error-message";
+import { Form } from "../components/form";
 import {
   Pagination,
   PaginationProps,
@@ -6,18 +16,9 @@ import {
   QueryBuilder,
   getQuery,
 } from "../features/search";
-import { ErrorMessage } from "../components/error-message";
-import { Form } from "../components/form";
-import {
-  LoaderFunctionArgs,
-  useLoaderData,
-  useNavigate,
-} from "react-router-dom";
 import { SiteConfig } from "../utils/site-config";
-import { PropsWithChildren, useEffect } from "react";
-import { MdSearch } from "react-icons/md";
-import "../styles/search.scss";
 import { LoaderData } from "../utils/loader-data";
+import "../styles/search.css";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   switch (request.method) {

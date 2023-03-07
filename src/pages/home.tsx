@@ -1,10 +1,5 @@
 import { ErrorMessage } from "../components/error-message";
-import {
-  Link,
-  LoaderFunction,
-  LoaderFunctionArgs,
-  useLoaderData,
-} from "react-router-dom";
+import { Link, LoaderFunctionArgs, useLoaderData } from "react-router-dom";
 import {
   Search,
   QueryBuilder,
