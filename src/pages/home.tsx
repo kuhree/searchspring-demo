@@ -1,56 +1,44 @@
 import { ErrorMessage } from "../components/error-message";
-import { Link, LoaderFunctionArgs, useLoaderData } from "react-router-dom";
-import { Search, SearchQueryBuilder } from "../features/search";
+import {
+  Link,
+  LoaderFunction,
+  LoaderFunctionArgs,
+  useLoaderData,
+} from "react-router-dom";
+import {
+  Search,
+  QueryBuilder,
+  TrendingQuerySchema,
+  TrendingQuery,
+  getQuery,
+  TrendingQueryResponse,
+  SearchQuery,
+} from "../features/search";
 import { SiteConfig } from "../utils/site-config";
 import { SearchForm } from "./search";
 import { mergeClass } from "../utils/merge-class";
+import { LoaderData } from "../utils/loader-data";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   switch (request.method) {
     case "GET":
     default: {
-      // SearchQueryBuilder is not made for trending queries, some hackery required
-      const trendingQueryUrl = (() => {
-        const builder = new SearchQueryBuilder(undefined, {
-          path: "/api/suggest/trending",
-        })
-          .setParam("siteId", SiteConfig.id)
-          // @ts-expect-error -- limit is not part of a SearchQuery
-          .setParam("limit", SiteConfig.products.trendingCount);
+      const builder = new QueryBuilder<TrendingQuery>(
+        { limit: SiteConfig.products.trendingCount, siteId: SiteConfig.id },
+        { path: "/api/suggest/trending" },
+        TrendingQuerySchema
+      );
 
-        return builder.toStringQuery();
-      })();
-
-      const trendingResponse = await fetch(trendingQueryUrl)
-        .then((response) => {
-          if (response.ok) {
-            return response.json() as Promise<{
-              trending: {
-                queries: Array<{ searchQuery: string; popularity: number }>;
-              };
-            }>;
-          } else throw response.json();
-        })
-        .catch((error) => {
-          throw new Error(
-            "An error occured while fetching trending searches search.",
-            { cause: error }
-          );
-        });
-
-      return {
-        data: trendingResponse,
-      };
+      return getQuery<TrendingQueryResponse>(builder);
     }
   }
 }
 
 export function HomePage() {
-  let {
-    data: {
-      trending: { queries },
-    },
-  } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
+  const { data } = useLoaderData() as LoaderData<typeof loader>;
+  const {
+    trending: { queries },
+  } = data;
 
   return (
     <Search.Container className="max-w-screen-lg mx-auto lg:flex-col">
@@ -60,7 +48,9 @@ export function HomePage() {
           See the most popular searches for your store in the last 30 days.
         </p>
 
-        <SearchForm initialQuery={new SearchQueryBuilder().build()} />
+        <SearchForm
+          initialQuery={new QueryBuilder<SearchQuery>().build().json}
+        />
       </Search.Nav>
 
       <Search.Content>
