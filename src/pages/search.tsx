@@ -56,22 +56,24 @@ export function SearchPage() {
 
         <Pagination pagination={data.pagination} onPageSelect={onPageSelect} />
 
-        <details className="fill text-left">
-          <summary className="text-sm" />
+        {SiteConfig.isProd ? null : (
+          <details className="fill text-left">
+            <summary className="text-sm" />
 
-          <details>
-            <summary>View Query</summary>
+            <details>
+              <summary>View Query</summary>
 
-            <pre className="whitespace-pre-wrap">Url: {query.url}</pre>
-            <pre>JSON: {JSON.stringify(query.json, null, 2)}</pre>
+              <pre className="whitespace-pre-wrap">Url: {query.url}</pre>
+              <pre>JSON: {JSON.stringify(query.json, null, 2)}</pre>
+            </details>
+
+            <details>
+              <summary>View Data</summary>
+
+              <pre>{JSON.stringify(data, null, 2)}</pre>
+            </details>
           </details>
-
-          <details>
-            <summary>View Data</summary>
-
-            <pre>{JSON.stringify(data, null, 2)}</pre>
-          </details>
-        </details>
+        )}
       </Search.Nav>
 
       <Search.Content>

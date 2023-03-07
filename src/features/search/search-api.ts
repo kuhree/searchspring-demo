@@ -86,7 +86,7 @@ export const TrendingQuerySchema = SearchQuerySchema.pick({
   siteId: true,
 }).and(
   z.object({
-    limit: z.number().min(1).default(1),
+    limit: z.number().min(1).default(SiteConfig.products.trendingCount),
   })
 );
 
