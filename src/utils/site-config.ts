@@ -3,6 +3,8 @@
 export type SiteConfig = typeof SiteConfig;
 export const SiteConfig = {
   id: "scmq7n",
+  isProd: import.meta.env.PROD,
+  mode: import.meta.env.MODE,
 
   title: "Searchspring",
   description: "Search for your favorite clothes, gear, and accessories.",
@@ -14,8 +16,8 @@ export const SiteConfig = {
   ],
 
   products: {
-    trendingCount: 10,
-    pageRange: 2,
+    trendingCount: 10, // controls the default number of trending items to fetch
+    pageRange: 2, // controls the default number of pages to the left and right to attempt
   },
 } as const;
 

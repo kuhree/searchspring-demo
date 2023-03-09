@@ -1,9 +1,14 @@
 import { describe, expect, it } from "vitest";
 import { SiteConfig } from "../../utils/site-config";
-import { SearchQuery, SearchQueryBuilder } from "./search-api";
+import {
+  SearchQuery,
+  QueryBuilder,
+  TrendingQuery,
+  TrendingQuerySchema,
+} from "./search-api";
 
 describe("SearchQueryBuilder", () => {
-  const query: SearchQuery = {
+  const baseQuery: SearchQuery = {
     siteId: "abcde",
     q: "testing",
     page: 2,
@@ -13,52 +18,73 @@ describe("SearchQueryBuilder", () => {
   };
 
   it("returns a default query", () => {
-    const queryBuiler = new SearchQueryBuilder();
-    const json = queryBuiler.build();
+    const queryBuiler = new QueryBuilder();
+    const { json } = queryBuiler.build();
 
-    Object.keys(query).forEach((key) => {
+    Object.keys(baseQuery).forEach((key) => {
       expect(json).toHaveProperty(key);
 
-      switch (key as keyof typeof query) {
+      switch (key as keyof typeof baseQuery) {
         case "resultsFormat": {
-          expect(json[key as keyof typeof query]).toBe("native");
+          expect(json[key as keyof typeof baseQuery]).toBe("native");
           break;
         }
         case "siteId": {
-          expect(json[key as keyof typeof query]).toBe(SiteConfig.id);
+          expect(json[key as keyof typeof baseQuery]).toBe(SiteConfig.id);
           break;
         }
         case "page": {
-          expect(json[key as keyof typeof query]).toBe(1);
+          expect(json[key as keyof typeof baseQuery]).toBe(1);
           break;
         }
         case "q":
         default: {
-          expect(json[key as keyof typeof query]).toBe("");
+          expect(json[key as keyof typeof baseQuery]).toBe("");
           break;
         }
       }
     });
   });
 
-  it("returns a valid SearchQuery from a JSON SearchQuery", () => {
-    const queryBuilder = new SearchQueryBuilder(query);
-    const testQuery = queryBuilder.build();
+  it("supports trending queries", () => {
+    const trendingQuery: TrendingQuery = {
+      limit: SiteConfig.products.trendingCount,
+      siteId: SiteConfig.id,
+    };
+    const trendingEndpoint = "/api/suggest/trending";
+    const queryBuilder = new QueryBuilder<TrendingQuery>(
+      trendingQuery,
+      { path: trendingEndpoint },
+      TrendingQuerySchema
+    );
 
-    expect(testQuery).toMatchObject(query);
+    const { json, url, search } = queryBuilder.build();
+
+    expect(json).toMatchObject(trendingQuery);
+    expect(url).toContain(trendingEndpoint);
+    Object.keys(trendingQuery).forEach((key) => {
+      expect(search).toContain(`${key}=`);
+    });
+  });
+
+  it("returns a valid SearchQuery from a JSON SearchQuery", () => {
+    const queryBuilder = new QueryBuilder(baseQuery);
+    const { json: testQuery } = queryBuilder.build();
+
+    expect(testQuery).toMatchObject(baseQuery);
   });
 
   it("returns a valid SearchQuery from a string SearchQuery", () => {
-    const queryBuilder = new SearchQueryBuilder(query);
-    const strQuery = queryBuilder.toStringQuery();
-    const fromString = new SearchQueryBuilder(strQuery).build();
+    const queryBuilder = new QueryBuilder(baseQuery);
+    const { url: strQuery } = queryBuilder.build();
+    const { json: fromString } = new QueryBuilder(strQuery).build();
 
-    expect(fromString).toMatchObject(query);
+    expect(fromString).toMatchObject(baseQuery);
   });
 
-  Object.entries(query).forEach(([key, value]) => {
+  Object.entries(baseQuery).forEach(([key, value]) => {
     it(`can get a searchParam: ${key}`, () => {
-      const param = new SearchQueryBuilder(query).getParam(
+      const param = new QueryBuilder(baseQuery).getParam(
         key as keyof SearchQuery
       );
 
@@ -84,7 +110,7 @@ describe("SearchQueryBuilder", () => {
         }
       }
 
-      const param = new SearchQueryBuilder(query)
+      const param = new QueryBuilder(baseQuery)
         .setParam(key as keyof SearchQuery, newValue)
         .getParam(key as keyof SearchQuery);
       expect(param).toStrictEqual([newValue]);
@@ -113,7 +139,7 @@ describe("SearchQueryBuilder", () => {
       }
 
       const toThrow = () => {
-        new SearchQueryBuilder()
+        new QueryBuilder()
           // @ts-expect-error -- Need invalid types for test
           .setParam(key, newValue)
           .build();

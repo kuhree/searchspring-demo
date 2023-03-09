@@ -14,7 +14,6 @@ export function ErrorMessage({ summary, error }: ErrorMessageProps) {
             "An unknown error has occured. Check the console for more information."}
         </summary>
 
-        {/* eslint-disable-next-line -- process is definitely defined */}
         <div className="relative m-4 p-4 text-left text-muted bg-muted border-2 border-accent">
           <ErrorBoard summary="Cause">
             {error.cause instanceof Error ? (

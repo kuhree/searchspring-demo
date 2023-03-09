@@ -1,60 +1,47 @@
-import {
-  Pagination,
-  PaginationProps,
-  Search,
-  SearchQuery,
-  SearchQueryBuilder,
-  SearchQueryResponse,
-} from "../features/search";
-import { ErrorMessage } from "../components/error-message";
-import { Form } from "../components/form";
+import { PropsWithChildren, useEffect } from "react";
+import { MdSearch } from "react-icons/md";
 import {
   LoaderFunctionArgs,
   useLoaderData,
   useNavigate,
 } from "react-router-dom";
+
+import { ErrorMessage } from "../components/error-message";
+import { Form } from "../components/form";
+import {
+  Pagination,
+  PaginationProps,
+  Search,
+  SearchQuery,
+  QueryBuilder,
+  getQuery,
+} from "../features/search";
 import { SiteConfig } from "../utils/site-config";
-import { PropsWithChildren, useEffect } from "react";
-import { MdSearch } from "react-icons/md";
-import "../styles/search.scss";
+import { LoaderData } from "../utils/loader-data";
+import "../styles/search.css";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   switch (request.method) {
     case "GET":
     default: {
-      const requestUrl = new URL(request.url);
-      const query = new SearchQueryBuilder(requestUrl.search);
-      const queryJson = query.build();
-      const queryUrl = query.toStringQuery();
+      const builder = new QueryBuilder<SearchQuery>(request.url);
 
-      const seachResponse = await fetch(queryUrl);
-      if (!seachResponse.ok) {
-        throw new Error("An error occured while processing your search.", {
-          cause: seachResponse.json(),
-        });
-      }
-
-      const data = await seachResponse.json();
-
-      return {
-        query: { json: queryJson, str: queryUrl },
-        data: data as SearchQueryResponse,
-      };
+      return getQuery(builder);
     }
   }
 }
 
 export function SearchPage() {
   const navigate = useNavigate();
-  let { query, data } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
+  const { query, data } = useLoaderData() as LoaderData<typeof loader>;
 
   const onPageSelect: PaginationProps["onPageSelect"] = (page) => {
-    const builder = new SearchQueryBuilder(window.location.search).setParam(
+    const builder = new QueryBuilder(window.location.search).setParam(
       "page",
       page
     );
 
-    navigate(`/search?${builder.toSearchParams()}`);
+    navigate(`/search?${builder.build().search}`);
   };
 
   return (
@@ -69,22 +56,24 @@ export function SearchPage() {
 
         <Pagination pagination={data.pagination} onPageSelect={onPageSelect} />
 
-        <details className="fill text-left">
-          <summary className="text-sm" />
+        {SiteConfig.isProd ? null : (
+          <details className="fill text-left">
+            <summary className="text-sm" />
 
-          <details>
-            <summary>View Query</summary>
+            <details>
+              <summary>View Query</summary>
 
-            <pre>JSON: {JSON.stringify(query.json, null, 2)}</pre>
-            <pre className="whitespace-pre-wrap">Query: {query.str}</pre>
+              <pre className="whitespace-pre-wrap">Url: {query.url}</pre>
+              <pre>JSON: {JSON.stringify(query.json, null, 2)}</pre>
+            </details>
+
+            <details>
+              <summary>View Data</summary>
+
+              <pre>{JSON.stringify(data, null, 2)}</pre>
+            </details>
           </details>
-
-          <details>
-            <summary>View Data</summary>
-
-            <pre>{JSON.stringify(data, null, 2)}</pre>
-          </details>
-        </details>
+        )}
       </Search.Nav>
 
       <Search.Content>
