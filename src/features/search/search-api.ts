@@ -81,18 +81,42 @@ const SearchQuerySchema = z.object({
   siteId: z.string().min(4).default(SiteConfig.id),
 });
 
+export type TrendingQuery = z.infer<typeof TrendingQuerySchema>;
+export const TrendingQuerySchema = SearchQuerySchema.pick({
+  siteId: true,
+}).and(
+  z.object({
+    limit: z.number().min(1).default(SiteConfig.products.trendingCount),
+  })
+);
+
+export type TrendingQueryResponse = z.infer<typeof TrendingQueryResponseSchema>;
+export const TrendingQueryResponseSchema = z.object({
+  trending: z.object({
+    queries: z.array(
+      z.object({
+        searchQuery: z.string().min(1),
+        popularity: z.number().min(1),
+      })
+    ),
+  }),
+});
+
 export type NetworkConfig = z.infer<typeof NetworkConfigSchema>;
 const NetworkConfigSchema = z.object({
   url: z.string().url().optional(),
   path: z.string().min(1).optional(),
 });
 
-export class SearchQueryBuilder {
+export class QueryBuilder<
+  Query extends { [key: string]: unknown } = SearchQuery
+> {
   private readonly url: URL;
 
   constructor(
-    rawQuery?: undefined | string | SearchQuery,
-    network?: NetworkConfig
+    readonly rawQuery?: undefined | string | Query,
+    readonly network?: NetworkConfig,
+    private readonly schema: z.ZodSchema = SearchQuerySchema
   ) {
     const {
       path = "/api/search/search.json",
@@ -105,54 +129,67 @@ export class SearchQueryBuilder {
       const params = new URLSearchParams(rawQuery.split("?").at(-1));
 
       params.forEach((value, name) => {
-        this.setParam(name as keyof SearchQuery, value);
+        this.setParam(name as keyof Query, value as Query[keyof Query]);
       });
 
-      return new SearchQueryBuilder(this.build());
+      const { json } = this.build();
+      return new QueryBuilder(json);
     } else if (rawQuery) {
-      const baseQuery = SearchQuerySchema.parse(rawQuery);
+      const baseQuery = this.schema.parse(rawQuery);
       for (const [name, value] of Object.entries(baseQuery)) {
-        this.setParam(name as keyof typeof baseQuery, String(value));
+        this.setParam(name as keyof Query, String(value) as Query[keyof Query]);
       }
     }
   }
 
-  setParam(name: keyof SearchQuery, rawValue: SearchQuery[typeof name]) {
+  setParam(name: keyof Query, rawValue: Query[typeof name]) {
     const parsedValue = z.string().or(z.number()).parse(rawValue);
-    this.url.searchParams.set(name, String(parsedValue));
+    this.url.searchParams.set(String(name), String(parsedValue));
 
     return this;
   }
 
-  getParam(name: keyof SearchQuery) {
-    return this.url.searchParams.getAll(name);
+  getParam(name: keyof Query) {
+    return this.url.searchParams.getAll(String(name));
   }
 
-  deleteParam(name: keyof SearchQuery) {
-    this.url.searchParams.delete(name);
+  deleteParam(name: keyof Query) {
+    this.url.searchParams.delete(String(name));
   }
 
-  build(): SearchQuery {
+  build() {
     const params: Record<string, unknown> = {};
 
     this.url.searchParams.forEach((value, key) => {
-      if (key === "page") {
+      if (key === "page" || key === "limit") {
         params[key] = Number(value);
       } else {
         params[key] = value;
       }
     });
 
-    return SearchQuerySchema.parse(params);
+    return {
+      json: this.schema.parse(params) as Query,
+      url: this.url.toString(),
+      search: this.url.search,
+    };
+  }
+}
+
+export async function getQuery<ExpectedResponse = SearchQueryResponse>(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  builder: QueryBuilder<any>
+) {
+  const query = builder.build();
+
+  const response = await fetch(query.url);
+  if (!response.ok) {
+    throw new Error("An error occured while processing your search.", {
+      cause: response.json(),
+    });
   }
 
-  toStringQuery() {
-    this.build();
-    return this.url.toString();
-  }
+  const data = (await response.json()) as ExpectedResponse; // sue me (or write them before we get sued)
 
-  toSearchParams() {
-    this.build();
-    return this.url.searchParams.toString();
-  }
+  return { query, data };
 }

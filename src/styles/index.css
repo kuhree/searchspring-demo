@@ -12,8 +12,8 @@
     --text-muted: 27, 21, 50;
     --text-accent: 127, 90, 255;
 
-    --bg-image-primary: url("/images/backgrounds/primary.jpg");
-    --bg-image-secondary: url("/images/backgrounds/secondary.png");
+    --bg-image-primary: url("/images/backgrounds/primary.webp");
+    --bg-image-secondary: url("/images/backgrounds/secondary.webp");
 
     --font-accent: '"Press Start 2P", monospace';
     --font-cursive: "Damion, cursive, monospace";
@@ -28,7 +28,7 @@
     --text-muted: 243, 240, 255;
     --text-accent: 197, 180, 255;
 
-    --bg-image-primary: url("/images/backgrounds/primary-dark.jpg");
+    --bg-image-primary: url("/images/backgrounds/primary-dark.webp");
 
     background-image: var(--bg-image-primary);
     background-repeat: no-repeat;
