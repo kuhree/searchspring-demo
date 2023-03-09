@@ -64,7 +64,7 @@
 
 ### Future Improvements
 
-- [x] Re-implement SearchQueryBuilder for other queries like `trending` and `best-selling`. [#1](#1)
+- [x] Re-implement SearchQueryBuilder for other queries like `trending` and `best-selling`. See PR #1
   - [x] Allow for a schema to be passed in that defines what to build and params to set.
 - [ ] UI testing w/ playwright
 
