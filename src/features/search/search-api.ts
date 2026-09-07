@@ -1,5 +1,3 @@
-/* eslint-disable no-use-before-define -- schemas === interfaces */
-
 import { z } from "zod";
 import { SiteConfig } from "../../utils/site-config";
 
@@ -102,21 +100,20 @@ export const TrendingQueryResponseSchema = z.object({
   }),
 });
 
-export type NetworkConfig = z.infer<typeof NetworkConfigSchema>;
-const NetworkConfigSchema = z.object({
-  url: z.string().url().optional(),
-  path: z.string().min(1).optional(),
-});
+export type NetworkConfig = {
+  path?: string;
+  url?: string;
+};
 
 export class QueryBuilder<
-  Query extends { [key: string]: unknown } = SearchQuery
+  Query extends { [key: string]: unknown } = SearchQuery,
 > {
   private readonly url: URL;
 
   constructor(
     readonly rawQuery?: undefined | string | Query,
     readonly network?: NetworkConfig,
-    private readonly schema: z.ZodSchema = SearchQuerySchema
+    private readonly schema: z.ZodType<Query> = SearchQuerySchema as unknown as z.ZodType<Query>
   ) {
     const {
       path = "/api/search/search.json",

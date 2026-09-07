@@ -1,5 +1,3 @@
-/* eslint-disable no-undef -- postcss requires cjs syntax */
-
 const makeColorClass = (variableName) => {
   return ({ opacityValue }) =>
     opacityValue

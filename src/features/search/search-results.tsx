@@ -1,5 +1,3 @@
-/* eslint-disable camelcase -- can't control db_data */
-
 import { HTMLProps, PropsWithChildren } from "react";
 import { mergeClass } from "../../utils/merge-class";
 import { SearchQueryResponse } from "./search-api";
@@ -73,7 +71,6 @@ function ProductCard({
     description,
     condition,
     ratingCount,
-    addToCartUrl,
     keywords,
     quantity_available,
     days_since_published,
