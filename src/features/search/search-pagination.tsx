@@ -7,7 +7,6 @@ export type PaginationProps = {
   container?: Pick<HTMLProps<HTMLDivElement>, "className">;
   pagination: SearchQueryResponse["pagination"];
   range?: number;
-  // eslint-disable-next-line -- It's a type!
   onPageSelect: (page: number) => void;
 };
 
